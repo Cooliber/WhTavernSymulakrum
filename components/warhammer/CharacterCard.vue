@@ -295,12 +295,23 @@ onMounted(() => {
 
 <style scoped>
 .character-card {
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .character-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .character-card {
+    transition: none !important;
+  }
+
+  .character-card:hover {
+    transform: none !important;
+  }
 }
 
 .stat-group {

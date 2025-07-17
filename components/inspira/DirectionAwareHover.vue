@@ -7,13 +7,13 @@
     @mouseleave="handleMouseLeave"
   >
     <!-- Default content -->
-    <div class="content-default transition-all duration-300" :class="{ 'opacity-100': !isHovered, 'opacity-0': isHovered }">
+    <div class="content-default transition-all duration-500 ease-out" :class="{ 'opacity-100': !isHovered, 'opacity-0': isHovered }">
       <slot name="content" />
     </div>
-    
+
     <!-- Hover content -->
-    <div 
-      class="content-hover absolute inset-0 transition-all duration-300"
+    <div
+      class="content-hover absolute inset-0 transition-all duration-500 ease-out"
       :class="{ 'opacity-0': !isHovered, 'opacity-100': isHovered }"
       :style="hoverStyle"
     >
@@ -37,21 +37,21 @@ const direction = ref('')
 
 const hoverStyle = computed(() => {
   if (!isHovered.value) {
-    // Position hover content off-screen based on direction
+    // Position hover content off-screen based on direction with more subtle movement
     switch (direction.value) {
       case 'top':
-        return { transform: 'translateY(-100%)' }
+        return { transform: 'translateY(-50%)', opacity: '0' }
       case 'bottom':
-        return { transform: 'translateY(100%)' }
+        return { transform: 'translateY(50%)', opacity: '0' }
       case 'left':
-        return { transform: 'translateX(-100%)' }
+        return { transform: 'translateX(-50%)', opacity: '0' }
       case 'right':
-        return { transform: 'translateX(100%)' }
+        return { transform: 'translateX(50%)', opacity: '0' }
       default:
-        return { transform: 'scale(0.8)', opacity: '0' }
+        return { transform: 'scale(0.95)', opacity: '0' }
     }
   }
-  return { transform: 'translate(0, 0)', opacity: '1' }
+  return { transform: 'translate(0, 0) scale(1)', opacity: '1' }
 })
 
 const getDirection = (event: MouseEvent) => {
@@ -91,5 +91,17 @@ const handleMouseLeave = () => {
 
 .content-hover {
   will-change: transform, opacity;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .content-default,
+  .content-hover {
+    transition: opacity 0.2s ease !important;
+  }
+
+  .content-hover {
+    transform: none !important;
+  }
 }
 </style>

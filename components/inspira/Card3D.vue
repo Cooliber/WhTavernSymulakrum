@@ -18,7 +18,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  rotationIntensity: 15,
+  rotationIntensity: 8,
   className: ''
 })
 
@@ -27,7 +27,7 @@ const rotateX = ref(0)
 const rotateY = ref(0)
 
 const cardStyle = computed(() => ({
-  transform: `perspective(1000px) rotateX(${rotateX.value}deg) rotateY(${rotateY.value}deg)`,
+  transform: `perspective(1200px) rotateX(${rotateX.value}deg) rotateY(${rotateY.value}deg) translateZ(0)`,
   transformStyle: 'preserve-3d'
 }))
 
@@ -58,5 +58,13 @@ const handleMouseLeave = () => {
 .card-3d {
   cursor: pointer;
   will-change: transform;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .card-3d {
+    transition: none !important;
+  }
 }
 </style>

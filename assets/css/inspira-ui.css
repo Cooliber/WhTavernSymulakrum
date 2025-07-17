@@ -110,10 +110,21 @@
 }
 
 .inspira-hover-lift:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 
-    0 20px 40px -10px rgba(0, 0, 0, 0.4),
-    0 0 0 1px rgba(255, 215, 0, 0.2);
+  transform: translateY(-2px) scale(1.01);
+  box-shadow:
+    0 8px 20px -5px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 215, 0, 0.1);
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .inspira-hover-lift {
+    transition: none !important;
+  }
+
+  .inspira-hover-lift:hover {
+    transform: none !important;
+  }
 }
 
 /* Border Beam Effect */
