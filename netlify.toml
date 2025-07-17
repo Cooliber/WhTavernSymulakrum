@@ -79,6 +79,9 @@
   directory = ".netlify/functions"
   node_bundler = "esbuild"
 
-# Edge functions
-[edge_functions]
-  directory = ".netlify/edge-functions"
+# Edge functions configuration
+# Note: Edge functions are defined as an array when needed
+# Example:
+# [[edge_functions]]
+#   path = "/api/*"
+#   function = "api-handler"
