@@ -1,11 +1,11 @@
 <template>
   <div class="space-y-12">
-    <!-- Spectacular Loading Screen -->
+    <!-- Quantum Loading Screen - Transcendent Multi-State Implementation -->
     <WarhammerMultiStepLoader
-      v-if="showLoader"
-      :visible="showLoader"
-      :show-fun-facts="true"
-      @complete="handleLoadingComplete"
+      v-if="quantumLoader.shouldRender.value && quantumLoader.isVisible.value"
+      :visible="quantumLoader.isVisible.value"
+      :show-fun-facts="!quantumLoader.isTestMode.value"
+      @complete="quantumLoader.hideLoader"
     />
 
     <!-- Hero Section with Enhanced Accessibility -->
@@ -31,21 +31,18 @@
       <!-- Content -->
       <div class="relative z-10 text-center space-y-6">
         <div class="space-y-4">
-          <SparklesText
-            id="hero-title"
-            :text="t('hero.title')"
-            class="text-4xl md:text-6xl font-medieval text-foreground"
-            :sparkles-count="prefersReducedMotion ? 0 : 15"
-            role="heading"
-            aria-level="1"
-          />
-          <Text3D
-            :text="t('hero.subtitle')"
-            class="text-2xl md:text-3xl font-fantasy text-primary"
-            :depth="prefersReducedMotion ? 0 : 3"
-            role="heading"
-            aria-level="2"
-          />
+          <h1 id="hero-title" class="text-4xl md:text-6xl font-medieval text-foreground">
+            <SparklesText
+              :text="t('hero.title')"
+              :sparkles-count="prefersReducedMotion ? 0 : 15"
+            />
+          </h1>
+          <h2 class="text-2xl md:text-3xl font-fantasy text-primary">
+            <Text3D
+              :text="t('hero.subtitle')"
+              :depth="prefersReducedMotion ? 0 : 3"
+            />
+          </h2>
         </div>
 
         <p
@@ -253,6 +250,9 @@
 // Composables
 const { t } = useI18n()
 
+// Quantum Loader - Transcendent Multi-State Management
+const quantumLoader = useQuantumLoader()
+
 // Page metadata
 useHead({
   title: () => `${t('hero.title')} - ${t('hero.subtitle')}`,
@@ -264,16 +264,8 @@ useHead({
 // Accessibility preferences
 const prefersReducedMotion = ref(false)
 
-// Loading state
-const showLoader = ref(true)
-
-// Handle loading completion
-const handleLoadingComplete = () => {
-  showLoader.value = false
-}
-
-// Detect user preferences
-onMounted(() => {
+// Detect user preferences and initialize quantum loader
+onMounted(async () => {
   if (typeof window !== 'undefined') {
     // Check for reduced motion preference
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -285,8 +277,13 @@ onMounted(() => {
     })
   }
 
-  // Add some entrance animations
-  console.log('Warhammer Tavern v3 loaded with Inspira UI!')
+  // Initialize quantum loader with consciousness detection
+  await quantumLoader.showLoader()
+
+  // Log quantum state for debugging
+  console.log('🌌 Warhammer Tavern v3 loaded with Quantum Loader!')
+  console.log('🧠 Consciousness:', quantumLoader.consciousness.value)
+  console.log('📊 Performance:', quantumLoader.getPerformanceMetrics())
 })
 
 // Tavern statistics

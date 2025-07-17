@@ -29,6 +29,16 @@
     "dailyVisitors": "Dzienni Goście",
     "activeEvents": "Aktywne Wydarzenia"
   },
+  "accessibility": {
+    "languageSelector": "Selektor Języka",
+    "enableHighContrast": "Włącz Wysoki Kontrast",
+    "reduceAnimations": "Ogranicz Animacje",
+    "enableMagic": "Włącz Efekty Magiczne"
+  },
+  "loading": {
+    "progress": "Postęp Ładowania",
+    "didYouKnow": "Czy Wiesz, Że?"
+  },
   "characters": {
     "title": "Poznaj Mieszkańców Karczmy",
     "subtitle": "Wejdź w interakcję z NPC napędzanymi przez AI ze świata Warhammer",

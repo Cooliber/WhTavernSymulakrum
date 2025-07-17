@@ -1,0 +1,150 @@
+# Page snapshot
+
+```yaml
+- link "Skip to main content":
+  - /url: "#main-content"
+- banner:
+  - link "Go to Warhammer Tavern homepage":
+    - /url: /
+    - img "Warhammer Tavern logo"
+    - paragraph: Simulator v3
+  - navigation "Main navigation":
+    - link "Tavern":
+      - /url: /
+    - link "Characters":
+      - /url: /characters
+    - link "Quests":
+      - /url: /quests
+    - link "Inventory":
+      - /url: /inventory
+    - link "Settings":
+      - /url: /settings
+  - text: AI UNKNOWN
+  - button "accessibility.languageSelector":
+    - img
+    - text: English
+    - img
+  - button "accessibility.enableHighContrast"
+  - button "accessibility.reduceAnimations"
+  - button "accessibility.enableMagic"
+- main:
+  - status "Przygotowywanie ciepłej atmosfery karczmy...":
+    - text: ✨ ✨ ✨ ✨ Warhammer Fantasy Tavern loading.progress 0%
+    - img
+    - heading "Rozpalanie ogniska" [level=3]
+    - paragraph: Przygotowywanie ciepłej atmosfery karczmy...
+    - status "Loading...":
+      - img
+    - text: Rozpalanie ogniska Przygotowywanie ciepłej atmosfery karczmy... 1500ms Przygotowywanie karczmy Ustawianie stołów i krzeseł... 2000ms Budzenie AI NPCs Inicjalizacja 17 inteligentnych postaci... 2500ms Inicjalizacja magii Łączenie z siłami Warhammer Fantasy... 1800ms Ładowanie treści Przygotowywanie historii i zadań... 1200ms
+  - banner "Warhammer Tavern v3":
+    - heading "Warhammer Tavern v3" [level=1]
+    - heading "Immerse yourself in the Warhammer Fantasy world with AI-powered NPCs" [level=2]
+    - paragraph: hero.description
+    - group "Main navigation actions":
+      - button "hero.enterTavernAriaLabel": hero.enterTavern
+      - button "hero.meetCharactersAriaLabel": hero.meetCharacters
+  - img
+  - text: "0"
+  - paragraph: stats.tavernReputation
+  - img
+  - text: "0"
+  - paragraph: stats.dailyVisitors
+  - img
+  - text: "0"
+  - paragraph: stats.activeEvents
+  - paragraph: characters.subtitle
+  - img
+  - heading "Sir Marcus Brightblade" [level=3]
+  - paragraph: Empire Knight
+  - text: Empire Sir Marcus Brightblade
+  - paragraph: A noble knight of the Empire, seeking glory and honor in service to Sigmar.
+  - img
+  - text: "0"
+  - img
+  - text: "0"
+  - button "Start Conversation"
+  - img
+  - heading "Grimjaw Ironbeard" [level=3]
+  - paragraph: Dwarf Slayer
+  - text: Dwarfs Grimjaw Ironbeard
+  - paragraph: A fierce dwarf warrior who has taken the Slayer Oath to redeem his honor.
+  - img
+  - text: "0"
+  - img
+  - text: "0"
+  - button "Start Conversation"
+  - img
+  - heading "Elara Moonwhisper" [level=3]
+  - paragraph: High Elf Mage
+  - text: High Elves Elara Moonwhisper
+  - paragraph: An elegant elven sorceress mastering the winds of magic.
+  - img
+  - text: "0"
+  - img
+  - text: "0"
+  - button "Start Conversation"
+  - img
+  - heading "Thorgrim the Bold" [level=3]
+  - paragraph: Dwarf Ranger
+  - text: Dwarfs Thorgrim the Bold
+  - paragraph: A seasoned ranger who knows every path through the mountains.
+  - img
+  - text: "0"
+  - img
+  - text: "0"
+  - button "Start Conversation"
+  - img
+  - heading "Valdris Shadowbane" [level=3]
+  - paragraph: Witch Hunter
+  - text: Empire Valdris Shadowbane
+  - paragraph: A grim hunter of heretics and creatures of darkness.
+  - img
+  - text: "0"
+  - img
+  - text: "0"
+  - button "Start Conversation"
+  - img
+  - heading "Lyralei Starweaver" [level=3]
+  - paragraph: Wood Elf Scout
+  - text: Wood Elves Lyralei Starweaver
+  - paragraph: A swift scout from the forests of Athel Loren.
+  - img
+  - text: "0"
+  - img
+  - text: "0"
+  - button "Start Conversation"
+  - paragraph: Stay updated with the latest happenings
+  - img
+  - text: Merchant Caravan Arrives
+  - paragraph: A wealthy merchant caravan from Altdorf has arrived with exotic goods.
+  - text: 2 hours ago
+  - img
+  - text: Brawl in the Common Room
+  - paragraph: A heated argument between a dwarf and an elf escalated into a tavern brawl.
+  - text: 4 hours ago
+  - img
+  - text: Mysterious Stranger
+  - paragraph: A hooded figure entered the tavern asking about ancient artifacts.
+  - text: 6 hours ago
+  - img
+  - text: Celebration Feast
+  - paragraph: The tavern hosted a celebration for a successful monster hunt.
+  - text: 1 day ago Ready for Adventure?
+  - paragraph: Join the most immersive Warhammer Fantasy experience with AI-powered storytelling
+  - button "Begin Your Journey"
+  - button "Learn More"
+  - text: ✨ ✨ ✨ ✨
+- contentinfo:
+  - paragraph: © 2025 Warhammer Tavern Simulator v3. Powered by Inspira UI
+  - status "Connected to Tavern"
+  - text: Connected to Tavern
+- navigation "Quick navigation dock":
+  - menubar:
+    - menuitem "Navigate to Tavern": Tavern
+    - menuitem "Navigate to Characters": Characters
+    - menuitem "Navigate to Conversations": Conversations
+    - menuitem "Navigate to Quests": Quests
+    - menuitem "Navigate to Inventory": Inventory
+    - menuitem "Navigate to Map": Map
+    - menuitem "Navigate to GM Dashboard": GM Dashboard
+```

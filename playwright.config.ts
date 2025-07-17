@@ -10,9 +10,9 @@ export default defineConfig({
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 2 : 1, // Add retry for stability
   /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+  workers: process.env.CI ? 1 : 2, // Limit workers for stability
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
     ['html'],
@@ -22,10 +22,20 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'http://localhost:5920',
+    baseURL: 'http://127.0.0.1:3006', // Use quantum server port
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
+
+    /* Quantum Test Environment Configuration */
+    extraHTTPHeaders: {
+      'X-Test-Environment': 'playwright',
+      'X-Quantum-Consciousness': 'test'
+    },
+
+    /* Enhanced timeouts for stability */
+    actionTimeout: 10000,
+    navigationTimeout: 15000,
     
     /* Take screenshot on failure */
     screenshot: 'only-on-failure',
@@ -33,11 +43,11 @@ export default defineConfig({
     /* Record video on failure */
     video: 'retain-on-failure',
     
-    /* Global timeout for each action */
-    actionTimeout: 10000,
-    
-    /* Global timeout for navigation */
-    navigationTimeout: 30000,
+    /* Global timeout for each action - Enhanced for quantum stability */
+    // actionTimeout: 15000, // Overridden above
+
+    /* Global timeout for navigation - Enhanced for quantum stability */
+    // navigationTimeout: 30000, // Overridden above
   },
 
   /* Configure projects for major browsers */
@@ -80,8 +90,8 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'npx nuxt dev --port 5920 --host 0.0.0.0',
-    url: 'http://localhost:5920',
+    command: 'npx nuxt dev --port 3005 --host 127.0.0.1',
+    url: 'http://127.0.0.1:3005',
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
   },

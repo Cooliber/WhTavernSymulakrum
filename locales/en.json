@@ -29,6 +29,16 @@
     "dailyVisitors": "Daily Visitors",
     "activeEvents": "Active Events"
   },
+  "accessibility": {
+    "languageSelector": "Language Selector",
+    "enableHighContrast": "Enable High Contrast",
+    "reduceAnimations": "Reduce Animations",
+    "enableMagic": "Enable Magic Effects"
+  },
+  "loading": {
+    "progress": "Loading Progress",
+    "didYouKnow": "Did You Know?"
+  },
   "characters": {
     "title": "Meet the Tavern's Inhabitants",
     "subtitle": "Interact with AI-powered NPCs from across the Warhammer world",

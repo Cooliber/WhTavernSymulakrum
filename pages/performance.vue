@@ -19,29 +19,29 @@
           <div class="performance-summary">
             <div class="flex flex-wrap justify-center gap-6 text-center">
               <div class="summary-item">
-                <div 
+                <div
                   class="text-4xl font-bold"
-                  :class="getScoreColor(performanceMonitoring.getPerformanceScore.value)"
+                  :class="getScoreColor(performanceScore)"
                 >
-                  {{ performanceMonitoring.getPerformanceScore.value }}
+                  {{ performanceScore }}
                 </div>
                 <div class="text-sm text-wh-wood-brown">Performance Score</div>
               </div>
               <div class="summary-item">
                 <div class="text-4xl font-bold text-wh-empire-gold">
-                  {{ performanceMonitoring.metrics.value.resourceCount }}
+                  {{ performanceMonitoring.metrics.length }}
                 </div>
-                <div class="text-sm text-wh-wood-brown">Resources</div>
+                <div class="text-sm text-wh-wood-brown">Metrics Count</div>
               </div>
               <div class="summary-item">
                 <div class="text-4xl font-bold text-blue-600">
-                  {{ formatMetricValue(performanceMonitoring.metrics.value.loadTime, 'ms') }}
+                  {{ formatMetricValue(averageResponseTime, 'ms') }}
                 </div>
-                <div class="text-sm text-wh-wood-brown">Load Time</div>
+                <div class="text-sm text-wh-wood-brown">Avg Response Time</div>
               </div>
               <div class="summary-item">
                 <div class="text-4xl font-bold text-green-600">
-                  {{ formatMemoryUsage(performanceMonitoring.metrics.value.jsHeapSize) }}
+                  {{ formatMemoryUsage(currentMemoryUsage) }}
                 </div>
                 <div class="text-sm text-wh-wood-brown">Memory Usage</div>
               </div>
@@ -250,28 +250,28 @@
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               <div class="metric-display">
                 <div class="text-2xl font-bold text-wh-bone">
-                  {{ performanceMonitoring.isSupported.value ? 'Supported' : 'Not Supported' }}
+                  {{ isSupported ? 'Supported' : 'Not Supported' }}
                 </div>
                 <div class="text-sm text-wh-light-grey">Browser Support</div>
               </div>
-              
+
               <div class="metric-display">
                 <div class="text-2xl font-bold text-wh-bone">
-                  {{ performanceMonitoring.isMonitoring.value ? 'Active' : 'Inactive' }}
+                  {{ performanceMonitoring.isMonitoring ? 'Active' : 'Inactive' }}
                 </div>
                 <div class="text-sm text-wh-light-grey">Monitoring Status</div>
               </div>
-              
+
               <div class="metric-display">
                 <div class="text-2xl font-bold text-wh-bone">
-                  {{ formatTimestamp(performanceMonitoring.metrics.value.timestamp) }}
+                  {{ formatTimestamp(lastUpdateTime) }}
                 </div>
                 <div class="text-sm text-wh-light-grey">Last Update</div>
               </div>
-              
+
               <div class="metric-display">
                 <div class="text-2xl font-bold text-wh-bone">
-                  {{ performanceMonitoring.getRecommendations.value.length }}
+                  {{ recommendationsCount }}
                 </div>
                 <div class="text-sm text-wh-light-grey">Recommendations</div>
               </div>
@@ -303,6 +303,55 @@ const layoutTestRunning = ref(false)
 const imageTestResults = ref<any>(null)
 const jsTestResults = ref<any>(null)
 const layoutTestResults = ref<any>(null)
+
+// Computed properties for missing values
+const performanceScore = computed(() => {
+  const stats = performanceMonitoring.overallStats
+  if (!stats || !stats.averageResponseTime) return 85
+
+  // Calculate score based on response time
+  const avgTime = stats.averageResponseTime
+  if (avgTime < 100) return 95
+  if (avgTime < 300) return 85
+  if (avgTime < 500) return 70
+  return 50
+})
+
+const averageResponseTime = computed(() => {
+  const stats = performanceMonitoring.overallStats
+  return stats?.averageResponseTime || 0
+})
+
+const currentMemoryUsage = computed(() => {
+  if (typeof window !== 'undefined' && (performance as any).memory) {
+    return (performance as any).memory.usedJSHeapSize || 0
+  }
+  return 0
+})
+
+const isSupported = computed(() => {
+  return typeof window !== 'undefined' && 'performance' in window
+})
+
+const lastUpdateTime = computed(() => {
+  const metrics = performanceMonitoring.metrics
+  if (metrics.length > 0) {
+    return metrics[metrics.length - 1].timestamp
+  }
+  return new Date()
+})
+
+const recommendationsCount = computed(() => {
+  // Generate recommendations based on performance data
+  let count = 0
+  const stats = performanceMonitoring.overallStats
+
+  if (stats?.averageResponseTime > 500) count++
+  if (stats?.errorRate > 0.1) count++
+  if (currentMemoryUsage.value > 50 * 1024 * 1024) count++ // 50MB
+
+  return count
+})
 
 // Methods
 const getScoreColor = (score: number): string => {

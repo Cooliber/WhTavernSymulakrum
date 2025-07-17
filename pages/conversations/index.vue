@@ -17,11 +17,32 @@
         />
       </Spotlight>
       
-      <Text3D 
+      <Text3D
         text="Engage with AI-Powered NPCs"
         class="text-xl md:text-2xl font-fantasy text-primary"
         :depth="3"
       />
+
+      <!-- Quick Actions -->
+      <div class="flex flex-wrap justify-center gap-4 mt-6">
+        <RippleButton
+          class="px-6 py-3 font-medieval text-lg faction-empire"
+          ripple-color="rgb(255, 215, 0)"
+          @click="navigateTo('/conversations/group')"
+        >
+          <Icon name="users" class="w-5 h-5 mr-2" />
+          {{ $t('conversations.createGroup') }}
+        </RippleButton>
+
+        <ShimmerButton
+          class="px-6 py-3 font-medieval text-lg"
+          shimmer-color="rgb(255, 215, 0)"
+          @click="joinRandomConversation"
+        >
+          <Icon name="shuffle" class="w-5 h-5 mr-2" />
+          {{ $t('conversations.joinRandom') }}
+        </ShimmerButton>
+      </div>
     </section>
 
     <!-- Available characters testimonials -->
@@ -156,6 +177,9 @@
 </template>
 
 <script setup lang="ts">
+// Composables
+const { t } = useI18n()
+
 // Page metadata
 useHead({
   title: 'Conversations - Warhammer Tavern Simulator v3',
@@ -284,6 +308,17 @@ const conversationTips = ref([
 const startConversation = (character: any) => {
   // Navigate to individual conversation page
   navigateTo(`/conversations/${character.id}`)
+}
+
+const joinRandomConversation = () => {
+  // Select a random character for conversation
+  if (characterTestimonials.value.length > 0) {
+    const randomIndex = Math.floor(Math.random() * characterTestimonials.value.length)
+    const randomCharacter = characterTestimonials.value[randomIndex]
+    if (randomCharacter) {
+      navigateTo(`/conversations/${randomCharacter.id}`)
+    }
+  }
 }
 
 // Lifecycle

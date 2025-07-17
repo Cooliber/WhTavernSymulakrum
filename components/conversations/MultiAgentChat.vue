@@ -236,6 +236,13 @@ const { t } = useI18n()
 const { generateCompletion, isInitialized } = useUnifiedAIService()
 const { getAgentById } = useWarhammerAgents()
 
+// Events
+const emit = defineEmits<{
+  'message-sent': [message: Message]
+  'agent-added': [agent: Agent]
+  'agent-removed': [agent: Agent]
+}>()
+
 // State
 const messages = ref<Message[]>([])
 const newMessage = ref('')
@@ -304,6 +311,9 @@ const sendMessage = async () => {
   messages.value.push(userMessage)
   const messageContent = newMessage.value.trim()
   newMessage.value = ''
+
+  // Emit message sent event
+  emit('message-sent', userMessage)
 
   // Scroll to bottom
   nextTick(() => {
@@ -482,6 +492,9 @@ const addAgent = (agent: Agent) => {
       agent
     }
     messages.value.push(joinMessage)
+
+    // Emit agent added event
+    emit('agent-added', agent)
   }
   showAgentSelector.value = false
 }
@@ -498,8 +511,11 @@ const removeAgent = (agentId: string) => {
       agent
     }
     messages.value.push(leaveMessage)
-    
+
     activeAgents.value = activeAgents.value.filter(a => a.id !== agentId)
+
+    // Emit agent removed event
+    emit('agent-removed', agent)
   }
 }
 

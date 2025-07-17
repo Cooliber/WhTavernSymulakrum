@@ -1,9 +1,11 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { quantumServerManager } from './server/adaptive-config'
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
 
-  // SSR Configuration
+  // SSR Configuration with Quantum Server Management
   ssr: true,
 
   // Modules for Warhammer Tavern v3 with Inspira UI
@@ -45,8 +47,9 @@ export default defineNuxtConfig({
     typeCheck: false // Disabled for faster development
   },
 
-  // Development server configuration
+  // Development server configuration with Quantum Management
   devServer: {
+    ...quantumServerManager.getNuxtServerConfig(),
     port: 5920,
     host: '0.0.0.0'
   },
@@ -181,5 +184,18 @@ export default defineNuxtConfig({
     public: {
       apiBase: process.env.API_BASE || 'http://localhost:8000'
     }
+  },
+
+  // Quantum Server Options for Enhanced Stability
+  serverOptions: quantumServerManager.getServerOptions(),
+
+  // Nitro configuration with quantum enhancements
+  nitro: {
+    experimental: {
+      wasm: false // Disable for stability
+    },
+    minify: false, // Disable in development for debugging
+    sourceMap: true,
+    timing: false // Disable timing headers for tests
   }
 })
