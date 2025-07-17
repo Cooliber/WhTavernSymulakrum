@@ -1,0 +1,3 @@
+[submodule "plugins/warhammer-pl"]
+	path = plugins/warhammer-pl
+	url = https://github.com/twisniowski/warhammer-pl
