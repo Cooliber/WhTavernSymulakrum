@@ -46,7 +46,30 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        
+
+        // Warhammer Theme Colors
+        'wh-black': '#000000',
+        'wh-dark-grey': '#1a1a1a',
+        'wh-grey': '#2a2a2a',
+        'wh-light-grey': '#4a4a4a',
+        'wh-bone': '#f8f5f0',
+        'wh-parchment': '#ede4c8',
+        'wh-aged-paper': '#d9c7a0',
+        'wh-empire-red': '#b71c1c',
+        'wh-empire-gold': '#ffb300',
+        'wh-empire-blue': '#1565c0',
+        'wh-chaos-red': '#8b0000',
+        'wh-chaos-purple': '#6a1b9a',
+        'wh-chaos-green': '#388e3c',
+        'wh-fire-orange': '#ff7043',
+        'wh-fire-red': '#e53935',
+        'wh-candle-yellow': '#ffc107',
+        'wh-wood-brown': '#8d6e63',
+        'wh-dark-wood': '#5d4037',
+        'wh-iron-grey': '#455a64',
+        'wh-copper': '#bf8f36',
+        'wh-brass': '#c9b037',
+
         // Warhammer Faction Colors
         faction: {
           empire: {
@@ -169,6 +192,11 @@ module.exports = {
         'fantasy': ['Uncial Antiqua', 'cursive'],
         'sharp': ['MedievalSharp', 'cursive'],
         'sans': ['Inter', 'sans-serif'],
+        'wh-display': ['Cinzel Decorative', 'Times New Roman', 'serif'],
+        'wh-heading': ['Cinzel', 'Georgia', 'serif'],
+        'wh-body': ['Cinzel', 'Georgia', 'serif'],
+        'wh-medieval': ['MedievalSharp', 'Times New Roman', 'serif'],
+        'wh-uncial': ['Uncial Antiqua', 'Times New Roman', 'serif'],
       },
       
       animation: {

@@ -12,6 +12,17 @@
       Skip to main content
     </a>
 
+    <!-- Enhanced Warhammer Background -->
+    <WarhammerBackground
+      :faction="currentFaction"
+      :time-of-day="currentTimeOfDay"
+      :weather="currentWeather"
+      :magical-effect="currentMagicalEffect"
+      :intensity="backgroundIntensity"
+      :show-meteors="showMeteors"
+      @time-change="handleTimeChange"
+    />
+
     <!-- Tavern Atmosphere Background -->
     <TavernAtmosphere
       :intensity="atmosphereIntensity"
@@ -119,6 +130,9 @@
 
             <!-- Accessibility Controls -->
             <div class="flex items-center space-x-2">
+              <!-- AI Status Indicator -->
+              <AIStatusIndicator compact />
+
               <!-- Language Switcher -->
               <LanguageSwitcher />
 
@@ -259,6 +273,9 @@
         </template>
       </Dock>
     </nav>
+
+    <!-- Notification Container -->
+    <NotificationContainer />
   </div>
 </template>
 
@@ -271,6 +288,14 @@ const { t } = useI18n()
 
 // Get current route
 const route = useRoute()
+
+// Warhammer Background state
+const currentFaction = ref<'empire' | 'chaos' | 'dwarfs' | 'elves' | 'orcs' | 'undead' | 'neutral'>('neutral')
+const currentTimeOfDay = ref<'dawn' | 'day' | 'dusk' | 'night'>('day')
+const currentWeather = ref<'clear' | 'rain' | 'snow' | 'fog' | 'storm'>('clear')
+const currentMagicalEffect = ref<'chaos' | 'divine' | 'waaagh' | 'necromancy' | null>(null)
+const backgroundIntensity = ref<'low' | 'medium' | 'high'>('medium')
+const showMeteors = ref(false)
 
 // Navigation items
 const navigationItems = computed(() => [
@@ -341,6 +366,20 @@ const skipToMain = () => {
   const mainContent = document.getElementById('main-content')
   if (mainContent) {
     mainContent.focus()
+  }
+}
+
+// Handle time changes from WarhammerBackground
+const handleTimeChange = (timeOfDay: string) => {
+  currentTimeOfDay.value = timeOfDay as 'dawn' | 'day' | 'dusk' | 'night'
+
+  // Adjust magical effects based on time
+  if (timeOfDay === 'night') {
+    currentMagicalEffect.value = Math.random() > 0.7 ? 'chaos' : null
+    showMeteors.value = Math.random() > 0.8
+  } else {
+    currentMagicalEffect.value = null
+    showMeteors.value = false
   }
 }
 

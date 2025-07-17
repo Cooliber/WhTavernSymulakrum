@@ -1,24 +1,79 @@
 <template>
   <div class="ai-performance-dashboard space-y-6">
+    <!-- Spectacular Header with Live Stats -->
+    <div class="dashboard-header relative overflow-hidden">
+      <WarhammerBackground
+        faction="neutral"
+        :time-of-day="'night'"
+        :weather="'clear'"
+        :intensity="'low'"
+        class="absolute inset-0 opacity-30"
+      />
+
+      <div class="relative z-10 p-6">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <HyperText
+              text="AI Command Center"
+              class="text-3xl font-wh-display text-wh-empire-gold mb-2"
+              :animation-duration="1500"
+            />
+            <SparklesText
+              text="Monitoring 17 AI Agents across the realm"
+              class="text-wh-wood-brown"
+              :sparkles-count="6"
+            />
+          </div>
+
+          <AIStatusIndicator compact />
+        </div>
+
+        <!-- Live Stats Grid -->
+        <LiveStatsWidget
+          title="System Performance"
+          icon="activity"
+          :stats="liveStats"
+          :columns="4"
+          size="lg"
+          theme="glass"
+          @refresh="refreshStats"
+          @view-details="showDetailedView = true"
+        />
+      </div>
+    </div>
+
     <!-- Health Status Overview -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <UCard>
+      <WarhammerCard class="relative overflow-hidden">
+        <BorderBeam v-if="overallHealth === 'healthy'" />
         <template #header>
           <div class="flex items-center space-x-2">
             <Icon name="activity" class="w-5 h-5 text-green-500" />
             <h3 class="font-semibold">Overall Health</h3>
           </div>
         </template>
-        
-        <div class="text-center">
-          <div class="text-3xl font-bold mb-2" :class="getHealthColor(overallHealth)">
-            {{ overallHealth.toUpperCase() }}
-          </div>
-          <p class="text-sm text-gray-600">System Status</p>
-        </div>
-      </UCard>
 
-      <UCard>
+        <div class="text-center">
+          <NumberTicker
+            :value="getHealthScore(overallHealth)"
+            format="percentage"
+            class="text-3xl font-bold mb-2"
+            :class="getHealthColor(overallHealth)"
+          />
+          <p class="text-sm text-gray-600">System Status</p>
+          <div class="mt-2">
+            <WarhammerBadge
+              :color="getHealthBadgeColor(overallHealth)"
+              variant="soft"
+              size="lg"
+            >
+              {{ overallHealth.toUpperCase() }}
+            </WarhammerBadge>
+          </div>
+        </div>
+      </WarhammerCard>
+
+      <WarhammerCard>
         <template #header>
           <div class="flex items-center space-x-2">
             <Icon name="zap" class="w-5 h-5 text-blue-500" />
@@ -32,9 +87,9 @@
           </div>
           <p class="text-sm text-gray-600">Average Response</p>
         </div>
-      </UCard>
+      </WarhammerCard>
 
-      <UCard>
+      <WarhammerCard>
         <template #header>
           <div class="flex items-center space-x-2">
             <Icon name="check-circle" class="w-5 h-5 text-green-500" />
@@ -48,15 +103,15 @@
           </div>
           <p class="text-sm text-gray-600">API Calls</p>
         </div>
-      </UCard>
+      </WarhammerCard>
     </div>
 
     <!-- Provider Status -->
-    <UCard>
+    <WarhammerCard>
       <template #header>
         <div class="flex items-center justify-between">
           <h3 class="font-semibold">AI Provider Status</h3>
-          <UButton
+          <WarhammerButton
             variant="ghost"
             size="sm"
             @click="refreshHealth"
@@ -64,7 +119,7 @@
           >
             <Icon name="refresh-cw" class="w-4 h-4" />
             Refresh
-          </UButton>
+          </WarhammerButton>
         </div>
       </template>
 
@@ -82,12 +137,12 @@
                 :class="getProviderHealthColor(provider)"
               ></div>
               <h4 class="font-medium capitalize">{{ provider.provider }}</h4>
-              <UBadge
+              <WarhammerBadge
                 :color="getProviderBadgeColor(provider)"
                 variant="soft"
               >
                 {{ getProviderHealth(provider.provider) }}
-              </UBadge>
+              </WarhammerBadge>
             </div>
             <div class="text-sm text-gray-600">
               {{ provider.totalRequests }} requests
@@ -116,12 +171,12 @@
           </div>
         </div>
       </div>
-    </UCard>
+    </WarhammerCard>
 
     <!-- Performance Metrics -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Response Time Chart -->
-      <UCard>
+      <WarhammerCard>
         <template #header>
           <h3 class="font-semibold">Response Time Trends</h3>
         </template>
@@ -165,10 +220,10 @@
             </div>
           </div>
         </div>
-      </UCard>
+      </WarhammerCard>
 
       <!-- Recent Activity -->
-      <UCard>
+      <WarhammerCard>
         <template #header>
           <h3 class="font-semibold">Recent Activity</h3>
         </template>
@@ -203,49 +258,49 @@
             No recent activity
           </div>
         </div>
-      </UCard>
+      </WarhammerCard>
     </div>
 
     <!-- Controls -->
-    <UCard>
+    <WarhammerCard>
       <template #header>
         <h3 class="font-semibold">Performance Controls</h3>
       </template>
       
       <div class="flex flex-wrap gap-4">
-        <UButton
+        <WarhammerButton
           variant="outline"
           @click="exportMetrics"
         >
           <Icon name="download" class="w-4 h-4 mr-2" />
           Export Metrics
-        </UButton>
-        
-        <UButton
+        </WarhammerButton>
+
+        <WarhammerButton
           variant="outline"
           @click="clearMetrics"
-          color="red"
+          faction="chaos"
         >
           <Icon name="trash-2" class="w-4 h-4 mr-2" />
           Clear Metrics
-        </UButton>
-        
-        <UButton
+        </WarhammerButton>
+
+        <WarhammerButton
           variant="outline"
           @click="toggleMonitoring"
         >
           <Icon :name="isMonitoring ? 'pause' : 'play'" class="w-4 h-4 mr-2" />
           {{ isMonitoring ? 'Pause' : 'Resume' }} Monitoring
-        </UButton>
+        </WarhammerButton>
       </div>
-    </UCard>
+    </WarhammerCard>
   </div>
 </template>
 
 <script setup lang="ts">
-const { 
-  providerStats, 
-  overallStats, 
+const {
+  providerStats,
+  overallStats,
   recentMetrics,
   getProviderHealth,
   getResponseTimePercentiles,
@@ -259,6 +314,53 @@ const { healthCheck } = useUnifiedAIService()
 
 // Local state
 const isRefreshing = ref(false)
+const showDetailedView = ref(false)
+
+// Live stats for the widget
+const liveStats = computed(() => [
+  {
+    id: 'response-time',
+    label: 'Avg Response Time',
+    value: overallStats.value.averageResponseTime,
+    unit: 'ms',
+    icon: 'zap',
+    format: 'time' as const,
+    trend: calculateTrend('responseTime'),
+    sparkline: getSparklineData('responseTime'),
+    type: 'primary' as const
+  },
+  {
+    id: 'success-rate',
+    label: 'Success Rate',
+    value: overallStats.value.successRate,
+    unit: '%',
+    icon: 'check-circle',
+    format: 'percentage' as const,
+    trend: calculateTrend('successRate'),
+    sparkline: getSparklineData('successRate'),
+    type: 'success' as const
+  },
+  {
+    id: 'total-requests',
+    label: 'Total Requests',
+    value: overallStats.value.totalRequests,
+    icon: 'activity',
+    format: 'number' as const,
+    trend: calculateTrend('totalRequests'),
+    sparkline: getSparklineData('totalRequests'),
+    type: 'info' as const
+  },
+  {
+    id: 'active-agents',
+    label: 'Active AI Agents',
+    value: providerStats.value.filter(p => getProviderHealth(p.provider) === 'healthy').length,
+    icon: 'users',
+    format: 'number' as const,
+    trend: 0,
+    sparkline: [],
+    type: 'primary' as const
+  }
+])
 
 // Computed properties
 const overallHealth = computed(() => {
@@ -284,14 +386,78 @@ const responseTimePercentiles = computed(() => {
 })
 
 // Methods
-const refreshHealth = async () => {
+const refreshStats = async () => {
   isRefreshing.value = true
   try {
     await healthCheck()
   } catch (error) {
-    console.error('Health check failed:', error)
+    console.error('Stats refresh failed:', error)
   } finally {
     isRefreshing.value = false
+  }
+}
+
+const refreshHealth = async () => {
+  await refreshStats()
+}
+
+const getHealthScore = (health: string): number => {
+  const scores = {
+    healthy: 100,
+    degraded: 75,
+    unhealthy: 25,
+    unknown: 0
+  }
+  return scores[health as keyof typeof scores] || 0
+}
+
+const getHealthBadgeColor = (health: string): string => {
+  const colors = {
+    healthy: 'green',
+    degraded: 'yellow',
+    unhealthy: 'red',
+    unknown: 'gray'
+  }
+  return colors[health as keyof typeof colors] || 'gray'
+}
+
+const calculateTrend = (metric: string): number => {
+  // Simple trend calculation based on recent metrics
+  const recent = recentMetrics.value.slice(0, 10)
+  if (recent.length < 2) return 0
+
+  const latest = recent[0]
+  const previous = recent[Math.floor(recent.length / 2)]
+
+  switch (metric) {
+    case 'responseTime':
+      return ((previous.responseTime - latest.responseTime) / previous.responseTime) * 100
+    case 'successRate':
+      const latestSuccess = recent.slice(0, 5).filter(m => m.success).length / 5
+      const previousSuccess = recent.slice(5, 10).filter(m => m.success).length / 5
+      return ((latestSuccess - previousSuccess) / previousSuccess) * 100
+    case 'totalRequests':
+      return 5 // Assume positive growth
+    default:
+      return 0
+  }
+}
+
+const getSparklineData = (metric: string): number[] => {
+  const recent = recentMetrics.value.slice(0, 20).reverse()
+
+  switch (metric) {
+    case 'responseTime':
+      return recent.map(m => m.responseTime)
+    case 'successRate':
+      return recent.map((_, index) => {
+        const chunk = recent.slice(Math.max(0, index - 4), index + 1)
+        return (chunk.filter(m => m.success).length / chunk.length) * 100
+      })
+    case 'totalRequests':
+      return recent.map((_, index) => index + 1)
+    default:
+      return []
   }
 }
 

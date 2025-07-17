@@ -1,5 +1,13 @@
 <template>
   <div class="space-y-12">
+    <!-- Spectacular Loading Screen -->
+    <WarhammerMultiStepLoader
+      v-if="showLoader"
+      :visible="showLoader"
+      :show-fun-facts="true"
+      @complete="handleLoadingComplete"
+    />
+
     <!-- Hero Section with Enhanced Accessibility -->
     <section
       class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-900/20 to-amber-800/20 p-8 md:p-12"
@@ -25,14 +33,14 @@
         <div class="space-y-4">
           <SparklesText
             id="hero-title"
-            :text="$t('hero.title')"
+            :text="t('hero.title')"
             class="text-4xl md:text-6xl font-medieval text-foreground"
             :sparkles-count="prefersReducedMotion ? 0 : 15"
             role="heading"
             aria-level="1"
           />
           <Text3D
-            :text="$t('hero.subtitle')"
+            :text="t('hero.subtitle')"
             class="text-2xl md:text-3xl font-fantasy text-primary"
             :depth="prefersReducedMotion ? 0 : 3"
             role="heading"
@@ -44,9 +52,9 @@
           class="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed"
           role="text"
         >
-          {{ $t('hero.description', {
-            aiNpcs: `<span class="text-primary font-medieval">${$t('hero.aiNpcs')}</span>`,
-            inspiraUi: `<span class="text-primary font-medieval">${$t('hero.inspiraUi')}</span>`
+          {{ t('hero.description', {
+            aiNpcs: `<span class="text-primary font-medieval">${t('hero.aiNpcs')}</span>`,
+            inspiraUi: `<span class="text-primary font-medieval">${t('hero.inspiraUi')}</span>`
           }) }}
         </p>
 
@@ -58,21 +66,21 @@
           <RippleButton
             class="faction-empire px-8 py-3 text-lg font-medieval wh-focus-ring"
             ripple-color="rgb(255, 215, 0)"
-            :aria-label="$t('hero.enterTavernAriaLabel')"
+            :aria-label="t('hero.enterTavernAriaLabel')"
             @click="enterTavern"
           >
             <Icon name="door-open" class="w-5 h-5 mr-2" aria-hidden="true" />
-            {{ $t('hero.enterTavern') }}
+            {{ t('hero.enterTavern') }}
           </RippleButton>
 
           <RainbowButton
             :colors="['#228b22', '#32cd32', '#90ee90']"
             class="px-8 py-3 text-lg font-medieval wh-focus-ring"
-            :aria-label="$t('hero.meetCharactersAriaLabel')"
+            :aria-label="t('hero.meetCharactersAriaLabel')"
             @click="viewCharacters"
           >
             <Icon name="users" class="w-5 h-5 mr-2" aria-hidden="true" />
-            {{ $t('hero.meetCharacters') }}
+            {{ t('hero.meetCharacters') }}
           </RainbowButton>
         </div>
       </div>
@@ -95,7 +103,7 @@
               :value="stat.value"
               class="text-3xl font-medieval text-foreground"
             />
-            <p class="text-sm text-muted-foreground font-medieval">{{ $t(`stats.${stat.key}`) }}</p>
+            <p class="text-sm text-muted-foreground font-medieval">{{ t(`stats.${stat.key}`) }}</p>
           </div>
         </div>
       </Card3D>
@@ -105,11 +113,11 @@
     <section class="space-y-6">
       <div class="text-center space-y-2">
         <HyperText
-          :text="$t('characters.title')"
+          :text="t('characters.title')"
           class="text-3xl font-medieval text-foreground"
           :animation-duration="1500"
         />
-        <p class="text-muted-foreground">{{ $t('characters.subtitle') }}</p>
+        <p class="text-muted-foreground">{{ t('characters.subtitle') }}</p>
       </div>
       
       <ExpandableGallery 
@@ -255,6 +263,14 @@ useHead({
 
 // Accessibility preferences
 const prefersReducedMotion = ref(false)
+
+// Loading state
+const showLoader = ref(true)
+
+// Handle loading completion
+const handleLoadingComplete = () => {
+  showLoader.value = false
+}
 
 // Detect user preferences
 onMounted(() => {

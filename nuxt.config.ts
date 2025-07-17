@@ -3,30 +3,8 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
 
-  // Static Site Generation for Netlify deployment
+  // SSR Configuration
   ssr: true,
-  nitro: {
-    preset: 'netlify-static',
-    prerender: {
-      crawlLinks: true,
-      routes: [
-        '/',
-        '/characters',
-        '/tavern',
-        '/gm-dashboard',
-        '/settings',
-        '/about',
-        '/generators',
-        '/inspira-test',
-        '/battle',
-        '/inventory',
-        '/map',
-        '/test-components',
-        '/conversations',
-        '/quests'
-      ]
-    }
-  },
 
   // Modules for Warhammer Tavern v3 with Inspira UI
   modules: [
@@ -89,7 +67,7 @@ export default defineNuxtConfig({
 
   // Nitro configuration for deployment
   nitro: {
-    preset: process.env.NITRO_PRESET || 'node-server',
+    preset: process.env.NITRO_PRESET || 'netlify-static',
     experimental: {
       wasm: true
     },
@@ -97,6 +75,50 @@ export default defineNuxtConfig({
       redis: {
         driver: 'redis',
         // Redis configuration will be set via environment variables
+      }
+    },
+    prerender: {
+      crawlLinks: true,
+      routes: [
+        '/',
+        '/characters',
+        '/tavern',
+        '/gm-dashboard',
+        '/settings',
+        '/about',
+        '/generators',
+        '/inspira-test',
+        '/battle',
+        '/inventory',
+        '/map',
+        '/test-components',
+        '/conversations',
+        '/quests'
+      ]
+    },
+    // Fix MIME type issues
+    routeRules: {
+      '/**': {
+        headers: {
+          'Cache-Control': 's-maxage=31536000',
+          'Content-Type': 'text/html; charset=utf-8'
+        }
+      },
+      '/_nuxt/**': {
+        headers: {
+          'Cache-Control': 'max-age=31536000, immutable',
+          'Content-Type': 'application/javascript; charset=utf-8'
+        }
+      },
+      '/css/**': {
+        headers: {
+          'Content-Type': 'text/css; charset=utf-8'
+        }
+      },
+      '/**/*.css': {
+        headers: {
+          'Content-Type': 'text/css; charset=utf-8'
+        }
       }
     }
   },

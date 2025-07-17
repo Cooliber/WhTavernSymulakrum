@@ -52,16 +52,16 @@
         <!-- Tab Navigation -->
         <div class="tab-navigation mb-8">
           <div class="flex flex-wrap justify-center gap-2">
-            <UButton
+            <WarhammerButton
               v-for="tab in tabs"
               :key="tab.id"
-              :variant="activeTab === tab.id ? 'solid' : 'ghost'"
+              :variant="activeTab === tab.id ? 'primary' : 'ghost'"
               size="md"
               @click="activeTab = tab.id"
             >
               <Icon :name="tab.icon" class="w-4 h-4 mr-2" />
               {{ tab.label }}
-            </UButton>
+            </WarhammerButton>
           </div>
         </div>
 
@@ -99,8 +99,9 @@
                 :key="npc.id"
                 class="npc-card"
               >
-                <UCard
+                <WarhammerCard
                   class="hover:shadow-lg transition-all duration-200"
+                  interactive
                   @click="handleNPCInteraction(npc)"
                 >
                   <template #header>
@@ -157,7 +158,7 @@
                       </UButton>
                     </div>
                   </template>
-                </UCard>
+                </WarhammerCard>
               </div>
             </div>
 
@@ -191,7 +192,7 @@
                   :key="event.id"
                   class="event-card"
                 >
-                  <UCard class="border-2 border-green-400">
+                  <WarhammerCard class="border-2 border-green-400">
                     <template #header>
                       <h4 class="font-wh-heading text-wh-dark-wood">{{ event.title }}</h4>
                       <p class="text-sm text-wh-wood-brown">{{ event.description }}</p>
@@ -221,31 +222,31 @@
                       <div v-if="event.rewards && event.rewards.length > 0" class="event-rewards">
                         <h4 class="text-xs font-semibold text-wh-wood-brown mb-1">Rewards:</h4>
                         <div class="flex flex-wrap gap-1">
-                          <UBadge
+                          <WarhammerBadge
                             v-for="reward in event.rewards"
                             :key="reward.type"
                             color="yellow"
                             variant="soft"
                           >
                             {{ reward.description }}
-                          </UBadge>
+                          </WarhammerBadge>
                         </div>
                       </div>
                     </div>
 
                     <template #footer>
                       <div class="text-center">
-                        <UButton
-                          color="primary"
+                        <WarhammerButton
+                          variant="primary"
                           size="sm"
                           :disabled="isEventFull(event)"
                           @click="joinEvent(event)"
                         >
                           {{ isEventFull(event) ? 'Event Full' : 'Join Event' }}
-                        </UButton>
+                        </WarhammerButton>
                       </div>
                     </template>
-                  </UCard>
+                  </WarhammerCard>
                 </div>
               </div>
             </div>

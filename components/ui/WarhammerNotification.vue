@@ -41,13 +41,13 @@
           
           <!-- Action Button -->
           <div v-if="action" class="notification-action mt-2">
-            <UButton
+            <WarhammerButton
               :variant="getActionVariant(type)"
               size="xs"
               @click="handleAction"
             >
               {{ action.label }}
-            </UButton>
+            </WarhammerButton>
           </div>
         </div>
 
@@ -236,7 +236,7 @@ const resumeAutoClose = () => {
 
 <style scoped>
 .warhammer-notification {
-  @apply relative max-w-sm w-full bg-wh-parchment border-2 border-wh-wood-brown rounded-lg shadow-xl overflow-hidden;
+  @apply relative max-w-sm w-full bg-amber-50 border-2 border-amber-700 rounded-lg shadow-xl overflow-hidden;
   font-family: var(--wh-font-body);
 }
 

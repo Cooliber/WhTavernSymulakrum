@@ -24,13 +24,13 @@
             AI System Status
           </span>
         </div>
-        <UBadge
+        <WarhammerBadge
           :color="getBadgeColor(overallHealth)"
           variant="soft"
           size="sm"
         >
           {{ overallHealth.toUpperCase() }}
-        </UBadge>
+        </WarhammerBadge>
       </div>
 
       <!-- Provider Status Grid -->
