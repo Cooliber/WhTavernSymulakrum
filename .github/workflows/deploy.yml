@@ -1,157 +1,180 @@
-name: Deploy to Netlify
+name: 🚀 Deploy to Netlify (Eternal Evolution Protocol)
 
 on:
   push:
-    branches: [ main, dev ]
+    branches: [ master, main, dev ]
   pull_request:
-    branches: [ main ]
+    branches: [ master, main ]
+
+# Sustainable DevOps - optimize for energy efficiency
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
+  # Phase 1: Quality Gates (Eternal Evolution Protocol)
   test:
+    name: 🔍 Quality Assurance
     runs-on: ubuntu-latest
-    
+
     strategy:
       matrix:
-        node-version: [18.x, 20.x]
-    
+        node-version: [20.x]
+
     steps:
-    - name: Checkout code
+    - name: 📥 Checkout code
       uses: actions/checkout@v4
-      
-    - name: Setup Node.js ${{ matrix.node-version }}
+
+    - name: 📦 Setup Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-        
-    - name: Install dependencies
-      run: npm ci
-      
-    - name: Run linting
-      run: npm run lint
+        cache: 'yarn'
+
+    - name: 🔧 Install dependencies
+      run: yarn install --frozen-lockfile
+
+    - name: 🧹 Run linting
+      run: yarn lint
       continue-on-error: true
-      
-    - name: Run unit tests
-      run: npm run test:unit
+
+    - name: 🧪 Run unit tests
+      run: yarn test:unit:run
       continue-on-error: true
-      
-    - name: Build application
-      run: npm run build
+
+    - name: 🏗️ Build application
+      run: yarn build
       env:
         NODE_ENV: production
-        NITRO_PRESET: netlify
-        
-    - name: Upload build artifacts
+
+    - name: 📊 Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
         name: build-${{ matrix.node-version }}
-        path: .output/
+        path: dist/
         retention-days: 1
 
+  # Phase 2: Preview Deployment
   deploy-preview:
+    name: 🔍 Deploy Preview
     runs-on: ubuntu-latest
     needs: test
     if: github.event_name == 'pull_request'
-    
+
     steps:
-    - name: Checkout code
+    - name: 📥 Checkout code
       uses: actions/checkout@v4
-      
-    - name: Setup Node.js
+
+    - name: 📦 Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18.x'
-        cache: 'npm'
-        
-    - name: Install dependencies
-      run: npm ci
-      
-    - name: Build for preview
-      run: npm run build
+        node-version: '20.x'
+        cache: 'yarn'
+
+    - name: 🔧 Install dependencies
+      run: yarn install --frozen-lockfile
+
+    - name: 🏗️ Build for preview
+      run: yarn build
       env:
         NODE_ENV: production
-        NITRO_PRESET: netlify
-        
-    - name: Deploy to Netlify (Preview)
-      uses: netlify/actions/cli@master
+
+    - name: 🚀 Deploy to Netlify (Preview)
+      uses: nwtgck/actions-netlify@v3.0
       with:
-        args: deploy --dir=.output/public --functions=.output/server
+        publish-dir: './dist'
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        deploy-message: "Deploy from GitHub Actions"
+        enable-pull-request-comment: true
+        enable-commit-comment: true
       env:
         NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
         NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
 
+  # Phase 3: Production Deployment (Sustainable DevOps)
   deploy-production:
+    name: 🌍 Deploy Production
     runs-on: ubuntu-latest
     needs: test
-    if: github.ref == 'refs/heads/main'
-    
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+
     steps:
-    - name: Checkout code
+    - name: 📥 Checkout code
       uses: actions/checkout@v4
-      
-    - name: Setup Node.js
+
+    - name: 📦 Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18.x'
-        cache: 'npm'
-        
-    - name: Install dependencies
-      run: npm ci
-      
-    - name: Build for production
-      run: npm run build
+        node-version: '20.x'
+        cache: 'yarn'
+
+    - name: 🔧 Install dependencies
+      run: yarn install --frozen-lockfile
+
+    - name: 🏗️ Build for production
+      run: yarn build
       env:
         NODE_ENV: production
-        NITRO_PRESET: netlify
-        
-    - name: Deploy to Netlify (Production)
-      uses: netlify/actions/cli@master
+
+    - name: 🚀 Deploy to Netlify (Production)
+      uses: nwtgck/actions-netlify@v3.0
       with:
-        args: deploy --prod --dir=.output/public --functions=.output/server
+        publish-dir: './dist'
+        production-deploy: true
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        deploy-message: "🚀 Production deployment from ${{ github.sha }}"
+        enable-commit-comment: true
       env:
         NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
         NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        
-    - name: Notify deployment success
+
+    - name: 📈 Notify deployment success
       if: success()
       run: |
-        echo "🚀 Deployment successful!"
-        echo "Site URL: https://${{ secrets.NETLIFY_SITE_ID }}.netlify.app"
+        echo "🚀 Production deployment successful!"
+        echo "🌍 Site URL: https://whfmaster.netlify.app"
+        echo "📊 Commit: ${{ github.sha }}"
 
+  # Phase 4: Development Deployment
   deploy-dev:
+    name: 🔧 Deploy Development
     runs-on: ubuntu-latest
     needs: test
     if: github.ref == 'refs/heads/dev'
-    
+
     steps:
-    - name: Checkout code
+    - name: 📥 Checkout code
       uses: actions/checkout@v4
-      
-    - name: Setup Node.js
+
+    - name: 📦 Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18.x'
-        cache: 'npm'
-        
-    - name: Install dependencies
-      run: npm ci
-      
-    - name: Build for development
-      run: npm run build
+        node-version: '20.x'
+        cache: 'yarn'
+
+    - name: 🔧 Install dependencies
+      run: yarn install --frozen-lockfile
+
+    - name: 🏗️ Build for development
+      run: yarn build
       env:
         NODE_ENV: development
-        NITRO_PRESET: netlify
-        
-    - name: Deploy to Netlify (Development)
-      uses: netlify/actions/cli@master
+
+    - name: 🚀 Deploy to Netlify (Development)
+      uses: nwtgck/actions-netlify@v3.0
       with:
-        args: deploy --alias=dev --dir=.output/public --functions=.output/server
+        publish-dir: './dist'
+        alias: dev
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        deploy-message: "🔧 Dev deployment from ${{ github.sha }}"
+        enable-commit-comment: true
       env:
         NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
         NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        
-    - name: Notify dev deployment
+
+    - name: 📊 Notify dev deployment
       if: success()
       run: |
         echo "🔧 Development deployment successful!"
-        echo "Dev URL: https://dev--${{ secrets.NETLIFY_SITE_ID }}.netlify.app"
+        echo "🌐 Dev URL: https://dev--whfmaster.netlify.app"
+        echo "📊 Commit: ${{ github.sha }}"
