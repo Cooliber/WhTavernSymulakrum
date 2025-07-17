@@ -75,7 +75,6 @@ export const useWarhammerIcons = () => {
     escort: 'users',
     hunt: 'target',
     exploration: 'map',
-    diplomacy: 'handshake',
     rescue: 'heart-handshake',
     
     // Factions

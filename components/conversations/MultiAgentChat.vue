@@ -233,6 +233,8 @@ interface Message {
 
 // Composables
 const { t } = useI18n()
+const { generateCompletion, isInitialized } = useUnifiedAIService()
+const { getAgentById } = useWarhammerAgents()
 
 // State
 const messages = ref<Message[]>([])
@@ -327,8 +329,8 @@ const simulateAgentResponses = async (userMessage: string) => {
     // Wait for realistic typing time
     await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000))
     
-    // Generate response based on agent personality
-    const response = generateAgentResponse(agent, userMessage)
+    // Generate response based on agent personality using AI
+    const response = await generateAgentResponse(agent, userMessage)
     
     const agentMessage: Message = {
       id: Date.now().toString() + agent.id,
@@ -355,9 +357,83 @@ const simulateAgentResponses = async (userMessage: string) => {
   isLoading.value = false
 }
 
-const generateAgentResponse = (agent: Agent, userMessage: string): string => {
-  // Simple response generation based on agent personality
-  const responses = {
+const generateAgentResponse = async (agent: Agent, userMessage: string): Promise<string> => {
+  try {
+    // Get the full agent data from the Warhammer agents system
+    const fullAgent = getAgentById(agent.id)
+    
+    // Build system prompt based on agent personality and background
+    const systemPrompt = buildAgentSystemPrompt(fullAgent || agent)
+    
+    // Get conversation context (last few messages)
+    const conversationContext = messages.value
+      .slice(-5) // Last 5 messages for context
+      .map(m => `${m.isUser ? 'Player' : m.agent?.name}: ${m.content}`)
+      .join('\n')
+    
+    // Create messages for AI
+    const aiMessages = [
+      {
+        role: 'user' as const,
+        content: `Context: ${conversationContext}\n\nPlayer just said: "${userMessage}"\n\nRespond as ${agent.name} would, staying in character.`
+      }
+    ]
+    
+    // Generate AI response
+    const response = await generateCompletion(aiMessages, {
+      systemPrompt,
+      maxTokens: 150,
+      temperature: 0.8,
+      preferredProvider: Math.random() > 0.5 ? 'groq' : 'cerebras' // Alternate between providers
+    })
+    
+    return response.content
+    
+  } catch (error) {
+    console.error('Error generating AI response:', error)
+    
+    // Fallback to hardcoded responses if AI fails
+    return generateFallbackResponse(agent, userMessage)
+  }
+}
+
+const buildAgentSystemPrompt = (agent: any): string => {
+  const personality = agent.personality || {}
+  const knowledge = agent.knowledge || {}
+  const conversationPatterns = agent.conversationPatterns || {}
+  
+  return `You are ${agent.name}, a ${agent.species} ${agent.career} in the Warhammer Fantasy universe.
+
+PERSONALITY:
+- Traits: ${personality.traits?.join(', ') || 'mysterious'}
+- Conversation Style: ${personality.conversationStyle || 'neutral'}
+- Mood: ${personality.mood || 'neutral'}
+- Intelligence: ${personality.intelligence || 5}/10
+- Charisma: ${personality.charisma || 5}/10
+
+BACKGROUND:
+- Faction: ${agent.faction}
+- Career: ${agent.career}
+- Species: ${agent.species}
+
+KNOWLEDGE DOMAINS:
+${knowledge.domains?.map((domain: string) => `- ${domain}`).join('\n') || '- General knowledge'}
+
+SPEECH PATTERNS:
+${conversationPatterns.speechPatterns?.map((pattern: string) => `- ${pattern}`).join('\n') || '- Speaks normally'}
+
+INSTRUCTIONS:
+- Stay completely in character as ${agent.name}
+- Use appropriate Warhammer Fantasy terminology and lore
+- Keep responses concise (1-3 sentences)
+- Match the personality traits and mood described above
+- Reference your background and knowledge when relevant
+- Never break character or mention being an AI`
+}
+
+const generateFallbackResponse = (agent: Agent, userMessage: string): string => {
+  // Fallback responses based on agent type
+  const fallbackResponses = {
     marcus: [
       "By Sigmar's hammer, that's an interesting point!",
       "Honor demands that we consider this carefully.",
@@ -384,7 +460,7 @@ const generateAgentResponse = (agent: Agent, userMessage: string): string => {
     ]
   }
 
-  const agentResponses = responses[agent.id as keyof typeof responses] || [
+  const agentResponses = fallbackResponses[agent.id as keyof typeof fallbackResponses] || [
     "Interesting perspective, friend.",
     "I see your point.",
     "That's worth considering."

@@ -1,21 +1,31 @@
 [build]
-  publish = "dist"
-  command = "npx nuxi generate"
-
-[build.environment]
-  NODE_VERSION = "20"
-
-# Redirects for SPA fallback - static site generation
-[[redirects]]
-  from = "/*"
-  to = "/200.html"
-  status = 200
-
-[dev]
-  command = "npm run dev"
-  port = 5920
+  command = "npm run build"
   publish = ".output/public"
 
+[build.environment]
+  NODE_VERSION = "18"
+  NPM_FLAGS = "--prefix=/dev/null"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[context.production]
+  command = "npm run build"
+
+[context.deploy-preview]
+  command = "npm run build"
+
+[context.branch-deploy]
+  command = "npm run build"
+
+# Environment variables for production
+[context.production.environment]
+  NODE_ENV = "production"
+  NITRO_PRESET = "netlify"
+
+# Headers for security and performance
 [[headers]]
   for = "/*"
   [headers.values]
@@ -23,13 +33,52 @@
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
 
 [[headers]]
-  for = "/assets/*"
+  for = "*.js"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
 [[headers]]
-  for = "/_nuxt/*"
+  for = "*.css"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.woff2"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.jpg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.webp"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# API routes
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
+
+# Functions configuration
+[functions]
+  directory = ".netlify/functions"
+  node_bundler = "esbuild"
+
+# Edge functions
+[edge_functions]
+  directory = ".netlify/edge-functions"

@@ -87,6 +87,20 @@ export default defineNuxtConfig({
     }
   },
 
+  // Nitro configuration for deployment
+  nitro: {
+    preset: process.env.NITRO_PRESET || 'node-server',
+    experimental: {
+      wasm: true
+    },
+    storage: {
+      redis: {
+        driver: 'redis',
+        // Redis configuration will be set via environment variables
+      }
+    }
+  },
+
   // App configuration
   app: {
     head: {
@@ -130,6 +144,18 @@ export default defineNuxtConfig({
 
   // Runtime configuration
   runtimeConfig: {
+    // Private keys (server-side only)
+    groqApiKey: process.env.GROQ_API_KEY || '',
+    cerebrasApiKey: process.env.CEREBRAS_API_KEY || '',
+    groqApiBase: process.env.GROQ_API_BASE || 'https://api.groq.com/openai/v1',
+    cerebrasApiBase: process.env.CEREBRAS_API_BASE || 'https://api.cerebras.ai/v1',
+    sessionPassword: process.env.NUXT_SESSION_PASSWORD || '',
+    rateLimitMaxRequests: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100'),
+    rateLimitWindowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '60000'),
+    redisUrl: process.env.REDIS_URL || '',
+    cacheTtl: parseInt(process.env.CACHE_TTL || '3600'),
+    
+    // Public keys (exposed to client-side)
     public: {
       apiBase: process.env.API_BASE || 'http://localhost:8000'
     }

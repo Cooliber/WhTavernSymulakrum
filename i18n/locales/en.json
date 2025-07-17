@@ -1,0 +1,152 @@
+{
+  "navigation": {
+    "home": "Home",
+    "characters": "Characters",
+    "tavern": "Tavern",
+    "quests": "Quests",
+    "inventory": "Inventory",
+    "map": "Map",
+    "settings": "Settings",
+    "about": "About",
+    "battle": "Battle",
+    "conversations": "Conversations",
+    "generators": "Generators",
+    "gmDashboard": "GM Dashboard"
+  },
+  "hero": {
+    "title": "Warhammer Tavern v3",
+    "subtitle": "Immerse yourself in the Warhammer Fantasy world with AI-powered NPCs",
+    "startAdventure": "Start Adventure",
+    "exploreWorld": "Explore World"
+  },
+  "tavern": {
+    "welcome": "Welcome to the tavern!",
+    "atmosphere": "Tavern atmosphere",
+    "npcs": "Non-player characters",
+    "conversations": "Conversations",
+    "orders": "Orders",
+    "rumors": "Rumors",
+    "entertainment": "Entertainment"
+  },
+  "characters": {
+    "create": "Create character",
+    "edit": "Edit character",
+    "delete": "Delete character",
+    "stats": "Statistics",
+    "skills": "Skills",
+    "equipment": "Equipment",
+    "background": "Background",
+    "name": "Name",
+    "career": "Career",
+    "species": "Species"
+  },
+  "conversations": {
+    "multiAgent": {
+      "title": "Multi-Agent Conversation",
+      "participants": "Participants",
+      "addAgent": "Add Agent",
+      "removeAgent": "Remove Agent",
+      "agentJoined": "{name} joined the conversation",
+      "agentLeft": "{name} left the conversation"
+    },
+    "typeMessage": "Type a message...",
+    "thinking": "Thinking...",
+    "selectCharacter": "Select Character",
+    "aiPowered": "AI-Powered",
+    "streamingResponse": "Streaming Response",
+    "contextAware": "Context Aware"
+  },
+  "ai": {
+    "providers": {
+      "groq": "Groq (Fast)",
+      "cerebras": "Cerebras (Deep)",
+      "fallback": "Fallback"
+    },
+    "status": {
+      "healthy": "Healthy",
+      "degraded": "Degraded",
+      "unhealthy": "Unhealthy",
+      "connecting": "Connecting...",
+      "error": "Error"
+    },
+    "metrics": {
+      "responseTime": "Response Time",
+      "successRate": "Success Rate",
+      "totalRequests": "Total Requests",
+      "tokensUsed": "Tokens Used"
+    }
+  },
+  "quests": {
+    "active": "Active quests",
+    "completed": "Completed quests",
+    "available": "Available quests",
+    "create": "Create quest",
+    "difficulty": "Difficulty",
+    "reward": "Reward",
+    "description": "Description"
+  },
+  "inventory": {
+    "weapons": "Weapons",
+    "armor": "Armor",
+    "items": "Items",
+    "consumables": "Consumables",
+    "weight": "Weight",
+    "value": "Value"
+  },
+  "settings": {
+    "language": "Language",
+    "theme": "Theme",
+    "audio": "Audio",
+    "graphics": "Graphics",
+    "accessibility": "Accessibility",
+    "aiSettings": "AI Settings",
+    "performance": "Performance"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "close": "Close",
+    "confirm": "Confirm",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Info",
+    "you": "You",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort"
+  },
+  "errors": {
+    "notFound": "Not Found",
+    "serverError": "Server Error",
+    "networkError": "Network Error",
+    "unauthorized": "Unauthorized",
+    "forbidden": "Forbidden",
+    "validationError": "Validation Error",
+    "aiServiceError": "AI Service Error",
+    "rateLimitExceeded": "Rate Limit Exceeded"
+  },
+  "factions": {
+    "empire": "Empire",
+    "dwarfs": "Dwarfs",
+    "highElves": "High Elves",
+    "woodElves": "Wood Elves",
+    "bretonia": "Bretonia",
+    "lizardmen": "Lizardmen",
+    "skaven": "Skaven",
+    "orcsGoblins": "Orcs & Goblins",
+    "vampireCounts": "Vampire Counts",
+    "tombKings": "Tomb Kings",
+    "chaosWarriors": "Chaos Warriors",
+    "beastsOfChaos": "Beasts of Chaos",
+    "daemonsOfChaos": "Daemons of Chaos",
+    "darkElves": "Dark Elves"
+  }
+}

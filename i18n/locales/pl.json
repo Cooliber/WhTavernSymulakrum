@@ -1,0 +1,152 @@
+{
+  "navigation": {
+    "home": "Strona główna",
+    "characters": "Postacie",
+    "tavern": "Karczma",
+    "quests": "Zadania",
+    "inventory": "Ekwipunek",
+    "map": "Mapa",
+    "settings": "Ustawienia",
+    "about": "O grze",
+    "battle": "Bitwa",
+    "conversations": "Rozmowy",
+    "generators": "Generatory",
+    "gmDashboard": "Panel MG"
+  },
+  "hero": {
+    "title": "Karczma Warhammer v3",
+    "subtitle": "Zanurz się w świecie Warhammer Fantasy z AI-napędzanymi NPC",
+    "startAdventure": "Rozpocznij przygodę",
+    "exploreWorld": "Odkryj świat"
+  },
+  "tavern": {
+    "welcome": "Witaj w karczmie!",
+    "atmosphere": "Atmosfera karczmy",
+    "npcs": "Postacie niezależne",
+    "conversations": "Rozmowy",
+    "orders": "Zamówienia",
+    "rumors": "Plotki",
+    "entertainment": "Rozrywka"
+  },
+  "characters": {
+    "create": "Stwórz postać",
+    "edit": "Edytuj postać",
+    "delete": "Usuń postać",
+    "stats": "Statystyki",
+    "skills": "Umiejętności",
+    "equipment": "Ekwipunek",
+    "background": "Tło",
+    "name": "Imię",
+    "career": "Kariera",
+    "species": "Rasa"
+  },
+  "conversations": {
+    "multiAgent": {
+      "title": "Rozmowa wieloagentowa",
+      "participants": "Uczestnicy",
+      "addAgent": "Dodaj agenta",
+      "removeAgent": "Usuń agenta",
+      "agentJoined": "{name} dołączył do rozmowy",
+      "agentLeft": "{name} opuścił rozmowy"
+    },
+    "typeMessage": "Napisz wiadomość...",
+    "thinking": "Myślę...",
+    "selectCharacter": "Wybierz postać",
+    "aiPowered": "Napędzane przez AI",
+    "streamingResponse": "Odpowiedź strumieniowa",
+    "contextAware": "Świadome kontekstu"
+  },
+  "ai": {
+    "providers": {
+      "groq": "Groq (Szybki)",
+      "cerebras": "Cerebras (Głęboki)",
+      "fallback": "Zapasowy"
+    },
+    "status": {
+      "healthy": "Zdrowy",
+      "degraded": "Pogorszony", 
+      "unhealthy": "Niezdrowy",
+      "connecting": "Łączenie...",
+      "error": "Błąd"
+    },
+    "metrics": {
+      "responseTime": "Czas odpowiedzi",
+      "successRate": "Wskaźnik sukcesu",
+      "totalRequests": "Łączne żądania",
+      "tokensUsed": "Użyte tokeny"
+    }
+  },
+  "quests": {
+    "active": "Aktywne zadania",
+    "completed": "Ukończone zadania",
+    "available": "Dostępne zadania",
+    "create": "Stwórz zadanie",
+    "difficulty": "Trudność",
+    "reward": "Nagroda",
+    "description": "Opis"
+  },
+  "inventory": {
+    "weapons": "Broń",
+    "armor": "Zbroja",
+    "items": "Przedmioty",
+    "consumables": "Materiały eksploatacyjne",
+    "weight": "Waga",
+    "value": "Wartość"
+  },
+  "settings": {
+    "language": "Język",
+    "theme": "Motyw",
+    "audio": "Dźwięk",
+    "graphics": "Grafika",
+    "accessibility": "Dostępność",
+    "aiSettings": "Ustawienia AI",
+    "performance": "Wydajność"
+  },
+  "common": {
+    "save": "Zapisz",
+    "cancel": "Anuluj",
+    "delete": "Usuń",
+    "edit": "Edytuj",
+    "create": "Stwórz",
+    "close": "Zamknij",
+    "confirm": "Potwierdź",
+    "loading": "Ładowanie...",
+    "error": "Błąd",
+    "success": "Sukces",
+    "warning": "Ostrzeżenie",
+    "info": "Informacja",
+    "you": "Ty",
+    "back": "Wstecz",
+    "next": "Dalej",
+    "previous": "Poprzedni",
+    "search": "Szukaj",
+    "filter": "Filtruj",
+    "sort": "Sortuj"
+  },
+  "errors": {
+    "notFound": "Nie znaleziono",
+    "serverError": "Błąd serwera",
+    "networkError": "Błąd sieci",
+    "unauthorized": "Nieautoryzowany",
+    "forbidden": "Zabronione",
+    "validationError": "Błąd walidacji",
+    "aiServiceError": "Błąd usługi AI",
+    "rateLimitExceeded": "Przekroczono limit żądań"
+  },
+  "factions": {
+    "empire": "Imperium",
+    "dwarfs": "Krasnoludy",
+    "highElves": "Wysokie Elfy",
+    "woodElves": "Leśne Elfy",
+    "bretonia": "Bretonia",
+    "lizardmen": "Jaszczuroludzie",
+    "skaven": "Skaveni",
+    "orcsGoblins": "Orkowie i Gobliny",
+    "vampireCounts": "Hrabiowie Wampirów",
+    "tombKings": "Królowie Grobowców",
+    "chaosWarriors": "Wojownicy Chaosu",
+    "beastsOfChaos": "Bestie Chaosu",
+    "daemonsOfChaos": "Demony Chaosu",
+    "darkElves": "Mroczne Elfy"
+  }
+}

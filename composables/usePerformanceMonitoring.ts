@@ -1,266 +1,357 @@
 /**
  * Performance Monitoring Composable
- * Warhammer Tavern v3
- * 
- * Provides utilities for monitoring application performance,
- * including image loading, component rendering, and user interactions
+ * Tracks AI API performance, response times, and system metrics
  */
 
-export interface PerformanceMetrics {
-  imageLoadTime: number
-  componentRenderTime: number
-  interactionResponseTime: number
-  memoryUsage: number
-  networkRequests: number
-  errorCount: number
+import { ref, computed, readonly } from 'vue'
+
+export interface PerformanceMetric {
+  id: string
+  timestamp: Date
+  provider: 'groq' | 'cerebras' | 'fallback'
+  operation: 'chat_completion' | 'health_check' | 'model_list'
+  responseTime: number
+  tokenCount?: number
+  success: boolean
+  error?: string
+  model?: string
 }
 
-export interface PerformanceEntry {
-  name: string
-  startTime: number
-  duration: number
-  type: 'image' | 'component' | 'interaction' | 'network'
-  metadata?: Record<string, any>
+export interface ProviderStats {
+  provider: string
+  totalRequests: number
+  successfulRequests: number
+  failedRequests: number
+  averageResponseTime: number
+  totalTokens: number
+  uptime: number
+  lastError?: string
+  lastErrorTime?: Date
 }
 
 export const usePerformanceMonitoring = () => {
-  // Performance entries storage
-  const performanceEntries = ref<PerformanceEntry[]>([])
-  const metrics = ref<PerformanceMetrics>({
-    imageLoadTime: 0,
-    componentRenderTime: 0,
-    interactionResponseTime: 0,
-    memoryUsage: 0,
-    networkRequests: 0,
-    errorCount: 0
-  })
+  // State
+  const metrics = ref<PerformanceMetric[]>([])
+  const isMonitoring = ref(true)
+  const maxMetrics = ref(1000) // Keep last 1000 metrics
 
-  // Performance observer
-  let performanceObserver: PerformanceObserver | null = null
-
-  // Initialize performance monitoring
-  const initializeMonitoring = () => {
-    if (process.client && 'PerformanceObserver' in window) {
-      performanceObserver = new PerformanceObserver((list) => {
-        const entries = list.getEntries()
-        
-        entries.forEach((entry) => {
-          // Process different types of performance entries
-          if (entry.entryType === 'resource') {
-            handleResourceEntry(entry as PerformanceResourceTiming)
-          } else if (entry.entryType === 'measure') {
-            handleMeasureEntry(entry as PerformanceMeasure)
-          } else if (entry.entryType === 'navigation') {
-            handleNavigationEntry(entry as PerformanceNavigationTiming)
-          }
-        })
-      })
-
-      // Observe different types of performance entries
-      try {
-        performanceObserver.observe({ 
-          entryTypes: ['resource', 'measure', 'navigation'] 
-        })
-      } catch (error) {
-        console.warn('Performance monitoring not fully supported:', error)
-      }
-    }
-  }
-
-  // Handle resource loading entries (images, scripts, etc.)
-  const handleResourceEntry = (entry: PerformanceResourceTiming) => {
-    const isImage = entry.name.match(/\.(jpg|jpeg|png|gif|webp|avif|svg)(\?.*)?$/i)
+  // Computed stats
+  const providerStats = computed((): ProviderStats[] => {
+    const stats: Record<string, ProviderStats> = {}
     
-    if (isImage) {
-      const imageEntry: PerformanceEntry = {
-        name: entry.name,
-        startTime: entry.startTime,
-        duration: entry.duration,
-        type: 'image',
-        metadata: {
-          transferSize: entry.transferSize,
-          encodedBodySize: entry.encodedBodySize,
-          decodedBodySize: entry.decodedBodySize
+    metrics.value.forEach(metric => {
+      if (!stats[metric.provider]) {
+        stats[metric.provider] = {
+          provider: metric.provider,
+          totalRequests: 0,
+          successfulRequests: 0,
+          failedRequests: 0,
+          averageResponseTime: 0,
+          totalTokens: 0,
+          uptime: 0
         }
       }
       
-      performanceEntries.value.push(imageEntry)
-      updateImageMetrics()
-    } else {
-      // Track network requests
-      metrics.value.networkRequests++
-    }
-  }
-
-  // Handle custom measure entries
-  const handleMeasureEntry = (entry: PerformanceMeasure) => {
-    const measureEntry: PerformanceEntry = {
-      name: entry.name,
-      startTime: entry.startTime,
-      duration: entry.duration,
-      type: entry.name.includes('component') ? 'component' : 'interaction'
-    }
-    
-    performanceEntries.value.push(measureEntry)
-    
-    if (entry.name.includes('component')) {
-      updateComponentMetrics()
-    } else if (entry.name.includes('interaction')) {
-      updateInteractionMetrics()
-    }
-  }
-
-  // Handle navigation entries
-  const handleNavigationEntry = (entry: PerformanceNavigationTiming) => {
-    // Update overall page performance metrics
-    const loadTime = entry.loadEventEnd - entry.navigationStart
-    console.log(`Page load time: ${loadTime}ms`)
-  }
-
-  // Update image loading metrics
-  const updateImageMetrics = () => {
-    const imageEntries = performanceEntries.value.filter(e => e.type === 'image')
-    if (imageEntries.length > 0) {
-      const totalTime = imageEntries.reduce((sum, entry) => sum + entry.duration, 0)
-      metrics.value.imageLoadTime = totalTime / imageEntries.length
-    }
-  }
-
-  // Update component rendering metrics
-  const updateComponentMetrics = () => {
-    const componentEntries = performanceEntries.value.filter(e => e.type === 'component')
-    if (componentEntries.length > 0) {
-      const totalTime = componentEntries.reduce((sum, entry) => sum + entry.duration, 0)
-      metrics.value.componentRenderTime = totalTime / componentEntries.length
-    }
-  }
-
-  // Update interaction response metrics
-  const updateInteractionMetrics = () => {
-    const interactionEntries = performanceEntries.value.filter(e => e.type === 'interaction')
-    if (interactionEntries.length > 0) {
-      const totalTime = interactionEntries.reduce((sum, entry) => sum + entry.duration, 0)
-      metrics.value.interactionResponseTime = totalTime / interactionEntries.length
-    }
-  }
-
-  // Measure component rendering time
-  const measureComponentRender = (componentName: string, renderFn: () => void) => {
-    const measureName = `component-render-${componentName}`
-    
-    performance.mark(`${measureName}-start`)
-    renderFn()
-    performance.mark(`${measureName}-end`)
-    
-    performance.measure(measureName, `${measureName}-start`, `${measureName}-end`)
-  }
-
-  // Measure interaction response time
-  const measureInteraction = async (interactionName: string, interactionFn: () => Promise<void>) => {
-    const measureName = `interaction-${interactionName}`
-    
-    performance.mark(`${measureName}-start`)
-    await interactionFn()
-    performance.mark(`${measureName}-end`)
-    
-    performance.measure(measureName, `${measureName}-start`, `${measureName}-end`)
-  }
-
-  // Get memory usage (if available)
-  const getMemoryUsage = () => {
-    if (process.client && 'memory' in performance) {
-      const memory = (performance as any).memory
-      metrics.value.memoryUsage = memory.usedJSHeapSize / 1024 / 1024 // MB
-      return {
-        used: memory.usedJSHeapSize / 1024 / 1024,
-        total: memory.totalJSHeapSize / 1024 / 1024,
-        limit: memory.jsHeapSizeLimit / 1024 / 1024
+      const stat = stats[metric.provider]
+      stat.totalRequests++
+      
+      if (metric.success) {
+        stat.successfulRequests++
+      } else {
+        stat.failedRequests++
+        stat.lastError = metric.error
+        stat.lastErrorTime = metric.timestamp
       }
-    }
-    return null
-  }
-
-  // Track errors
-  const trackError = (error: Error, context?: string) => {
-    metrics.value.errorCount++
-    
-    // Log error for debugging
-    console.error('Performance tracking error:', {
-      message: error.message,
-      stack: error.stack,
-      context,
-      timestamp: Date.now()
+      
+      stat.totalTokens += metric.tokenCount || 0
     })
-  }
-
-  // Get performance summary
-  const getPerformanceSummary = () => {
-    return {
-      metrics: { ...metrics.value },
-      entries: performanceEntries.value.slice(-50), // Last 50 entries
-      memoryUsage: getMemoryUsage(),
-      timestamp: Date.now()
-    }
-  }
-
-  // Clear performance data
-  const clearPerformanceData = () => {
-    performanceEntries.value = []
-    metrics.value = {
-      imageLoadTime: 0,
-      componentRenderTime: 0,
-      interactionResponseTime: 0,
-      memoryUsage: 0,
-      networkRequests: 0,
-      errorCount: 0
-    }
-  }
-
-  // Check if performance is degraded
-  const isPerformanceDegraded = () => {
-    const thresholds = {
-      imageLoadTime: 2000, // 2 seconds
-      componentRenderTime: 100, // 100ms
-      interactionResponseTime: 200, // 200ms
-      memoryUsage: 100 // 100MB
-    }
-
-    return (
-      metrics.value.imageLoadTime > thresholds.imageLoadTime ||
-      metrics.value.componentRenderTime > thresholds.componentRenderTime ||
-      metrics.value.interactionResponseTime > thresholds.interactionResponseTime ||
-      metrics.value.memoryUsage > thresholds.memoryUsage
-    )
-  }
-
-  // Initialize monitoring on mount
-  onMounted(() => {
-    initializeMonitoring()
     
-    // Update memory usage periodically
-    const memoryInterval = setInterval(() => {
-      getMemoryUsage()
-    }, 5000)
-
-    onUnmounted(() => {
-      clearInterval(memoryInterval)
-      performanceObserver?.disconnect()
+    // Calculate averages and uptime
+    Object.values(stats).forEach(stat => {
+      const providerMetrics = metrics.value.filter(m => m.provider === stat.provider)
+      
+      if (providerMetrics.length > 0) {
+        stat.averageResponseTime = providerMetrics.reduce((sum, m) => sum + m.responseTime, 0) / providerMetrics.length
+        stat.uptime = (stat.successfulRequests / stat.totalRequests) * 100
+      }
     })
+    
+    return Object.values(stats)
   })
+
+  const overallStats = computed(() => {
+    const total = metrics.value.length
+    const successful = metrics.value.filter(m => m.success).length
+    const failed = total - successful
+    
+    const avgResponseTime = total > 0 
+      ? metrics.value.reduce((sum, m) => sum + m.responseTime, 0) / total 
+      : 0
+    
+    const totalTokens = metrics.value.reduce((sum, m) => sum + (m.tokenCount || 0), 0)
+    
+    return {
+      totalRequests: total,
+      successfulRequests: successful,
+      failedRequests: failed,
+      successRate: total > 0 ? (successful / total) * 100 : 0,
+      averageResponseTime: avgResponseTime,
+      totalTokens
+    }
+  })
+
+  const recentMetrics = computed(() => {
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000)
+    return metrics.value.filter(m => m.timestamp > oneHourAgo)
+  })
+
+  // Methods
+  const recordMetric = (metric: Omit<PerformanceMetric, 'id' | 'timestamp'>) => {
+    if (!isMonitoring.value) return
+    
+    const newMetric: PerformanceMetric = {
+      ...metric,
+      id: `metric_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      timestamp: new Date()
+    }
+    
+    metrics.value.push(newMetric)
+    
+    // Keep only the most recent metrics
+    if (metrics.value.length > maxMetrics.value) {
+      metrics.value = metrics.value.slice(-maxMetrics.value)
+    }
+    
+    // Persist to storage
+    persistMetrics()
+  }
+
+  const startTimer = () => {
+    return Date.now()
+  }
+
+  const endTimer = (startTime: number): number => {
+    return Date.now() - startTime
+  }
+
+  const recordAPICall = async <T>(
+    provider: 'groq' | 'cerebras' | 'fallback',
+    operation: 'chat_completion' | 'health_check' | 'model_list',
+    apiCall: () => Promise<T>,
+    model?: string
+  ): Promise<T> => {
+    const startTime = startTimer()
+    
+    try {
+      const result = await apiCall()
+      const responseTime = endTimer(startTime)
+      
+      recordMetric({
+        provider,
+        operation,
+        responseTime,
+        success: true,
+        model
+      })
+      
+      return result
+    } catch (error) {
+      const responseTime = endTimer(startTime)
+      
+      recordMetric({
+        provider,
+        operation,
+        responseTime,
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        model
+      })
+      
+      throw error
+    }
+  }
+
+  const getProviderHealth = (provider: string): 'healthy' | 'degraded' | 'unhealthy' => {
+    const recentProviderMetrics = recentMetrics.value.filter(m => m.provider === provider)
+    
+    if (recentProviderMetrics.length === 0) return 'unhealthy'
+    
+    const successRate = recentProviderMetrics.filter(m => m.success).length / recentProviderMetrics.length
+    const avgResponseTime = recentProviderMetrics.reduce((sum, m) => sum + m.responseTime, 0) / recentProviderMetrics.length
+    
+    if (successRate >= 0.95 && avgResponseTime < 2000) return 'healthy'
+    if (successRate >= 0.8 && avgResponseTime < 5000) return 'degraded'
+    return 'unhealthy'
+  }
+
+  const getResponseTimePercentiles = (provider?: string) => {
+    const relevantMetrics = provider 
+      ? metrics.value.filter(m => m.provider === provider && m.success)
+      : metrics.value.filter(m => m.success)
+    
+    if (relevantMetrics.length === 0) {
+      return { p50: 0, p90: 0, p95: 0, p99: 0 }
+    }
+    
+    const sortedTimes = relevantMetrics
+      .map(m => m.responseTime)
+      .sort((a, b) => a - b)
+    
+    const getPercentile = (p: number) => {
+      const index = Math.ceil((p / 100) * sortedTimes.length) - 1
+      return sortedTimes[Math.max(0, index)]
+    }
+    
+    return {
+      p50: getPercentile(50),
+      p90: getPercentile(90),
+      p95: getPercentile(95),
+      p99: getPercentile(99)
+    }
+  }
+
+  const getErrorRate = (provider?: string, timeWindow?: number): number => {
+    const windowStart = timeWindow ? new Date(Date.now() - timeWindow) : new Date(0)
+    
+    const relevantMetrics = metrics.value.filter(m => {
+      const matchesProvider = !provider || m.provider === provider
+      const inTimeWindow = m.timestamp >= windowStart
+      return matchesProvider && inTimeWindow
+    })
+    
+    if (relevantMetrics.length === 0) return 0
+    
+    const errorCount = relevantMetrics.filter(m => !m.success).length
+    return (errorCount / relevantMetrics.length) * 100
+  }
+
+  const getTokensPerSecond = (provider?: string): number => {
+    const oneMinuteAgo = new Date(Date.now() - 60 * 1000)
+    const relevantMetrics = metrics.value.filter(m => {
+      const matchesProvider = !provider || m.provider === provider
+      const inTimeWindow = m.timestamp >= oneMinuteAgo
+      const hasTokens = m.tokenCount && m.tokenCount > 0
+      return matchesProvider && inTimeWindow && hasTokens && m.success
+    })
+    
+    if (relevantMetrics.length === 0) return 0
+    
+    const totalTokens = relevantMetrics.reduce((sum, m) => sum + (m.tokenCount || 0), 0)
+    const totalTime = relevantMetrics.reduce((sum, m) => sum + m.responseTime, 0) / 1000 // Convert to seconds
+    
+    return totalTime > 0 ? totalTokens / totalTime : 0
+  }
+
+  const exportMetrics = (): string => {
+    return JSON.stringify({
+      metrics: metrics.value,
+      exportedAt: new Date().toISOString(),
+      summary: overallStats.value
+    }, null, 2)
+  }
+
+  const importMetrics = (data: string): boolean => {
+    try {
+      const parsed = JSON.parse(data)
+      
+      if (parsed.metrics && Array.isArray(parsed.metrics)) {
+        // Convert timestamp strings back to Date objects
+        const importedMetrics = parsed.metrics.map((m: any) => ({
+          ...m,
+          timestamp: new Date(m.timestamp)
+        }))
+        
+        metrics.value = [...metrics.value, ...importedMetrics]
+        
+        // Keep only the most recent metrics
+        if (metrics.value.length > maxMetrics.value) {
+          metrics.value = metrics.value.slice(-maxMetrics.value)
+        }
+        
+        persistMetrics()
+        return true
+      }
+      
+      return false
+    } catch (error) {
+      console.error('Failed to import metrics:', error)
+      return false
+    }
+  }
+
+  const clearMetrics = () => {
+    metrics.value = []
+    if (process.client) {
+      localStorage.removeItem('performance_metrics')
+    }
+  }
+
+  const persistMetrics = () => {
+    if (!process.client) return
+    
+    try {
+      // Only persist recent metrics to avoid storage bloat
+      const recentMetricsToStore = metrics.value.slice(-500)
+      localStorage.setItem('performance_metrics', JSON.stringify(recentMetricsToStore))
+    } catch (error) {
+      console.error('Failed to persist metrics:', error)
+    }
+  }
+
+  const loadMetrics = () => {
+    if (!process.client) return
+    
+    try {
+      const stored = localStorage.getItem('performance_metrics')
+      if (stored) {
+        const storedMetrics = JSON.parse(stored)
+        
+        // Convert timestamp strings back to Date objects
+        metrics.value = storedMetrics.map((m: any) => ({
+          ...m,
+          timestamp: new Date(m.timestamp)
+        }))
+        
+        console.log(`📊 Loaded ${metrics.value.length} performance metrics`)
+      }
+    } catch (error) {
+      console.error('Failed to load metrics:', error)
+    }
+  }
+
+  const toggleMonitoring = () => {
+    isMonitoring.value = !isMonitoring.value
+  }
+
+  // Initialize
+  if (process.client) {
+    loadMetrics()
+  }
 
   return {
     // State
-    performanceEntries: readonly(performanceEntries),
     metrics: readonly(metrics),
-
+    isMonitoring: readonly(isMonitoring),
+    maxMetrics,
+    
+    // Computed
+    providerStats,
+    overallStats,
+    recentMetrics,
+    
     // Methods
-    measureComponentRender,
-    measureInteraction,
-    getMemoryUsage,
-    trackError,
-    getPerformanceSummary,
-    clearPerformanceData,
-    isPerformanceDegraded,
-    initializeMonitoring
+    recordMetric,
+    startTimer,
+    endTimer,
+    recordAPICall,
+    getProviderHealth,
+    getResponseTimePercentiles,
+    getErrorRate,
+    getTokensPerSecond,
+    exportMetrics,
+    importMetrics,
+    clearMetrics,
+    toggleMonitoring,
+    loadMetrics
   }
 }

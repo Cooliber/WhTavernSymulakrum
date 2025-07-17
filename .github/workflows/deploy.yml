@@ -1,0 +1,157 @@
+name: Deploy to Netlify
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run linting
+      run: npm run lint
+      continue-on-error: true
+      
+    - name: Run unit tests
+      run: npm run test:unit
+      continue-on-error: true
+      
+    - name: Build application
+      run: npm run build
+      env:
+        NODE_ENV: production
+        NITRO_PRESET: netlify
+        
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-${{ matrix.node-version }}
+        path: .output/
+        retention-days: 1
+
+  deploy-preview:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Build for preview
+      run: npm run build
+      env:
+        NODE_ENV: production
+        NITRO_PRESET: netlify
+        
+    - name: Deploy to Netlify (Preview)
+      uses: netlify/actions/cli@master
+      with:
+        args: deploy --dir=.output/public --functions=.output/server
+      env:
+        NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+
+  deploy-production:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Build for production
+      run: npm run build
+      env:
+        NODE_ENV: production
+        NITRO_PRESET: netlify
+        
+    - name: Deploy to Netlify (Production)
+      uses: netlify/actions/cli@master
+      with:
+        args: deploy --prod --dir=.output/public --functions=.output/server
+      env:
+        NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        
+    - name: Notify deployment success
+      if: success()
+      run: |
+        echo "🚀 Deployment successful!"
+        echo "Site URL: https://${{ secrets.NETLIFY_SITE_ID }}.netlify.app"
+
+  deploy-dev:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/dev'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Build for development
+      run: npm run build
+      env:
+        NODE_ENV: development
+        NITRO_PRESET: netlify
+        
+    - name: Deploy to Netlify (Development)
+      uses: netlify/actions/cli@master
+      with:
+        args: deploy --alias=dev --dir=.output/public --functions=.output/server
+      env:
+        NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        
+    - name: Notify dev deployment
+      if: success()
+      run: |
+        echo "🔧 Development deployment successful!"
+        echo "Dev URL: https://dev--${{ secrets.NETLIFY_SITE_ID }}.netlify.app"

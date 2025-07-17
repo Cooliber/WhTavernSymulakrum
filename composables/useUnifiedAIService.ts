@@ -3,6 +3,8 @@
  * Supports multiple AI providers: Groq, Cerebras, and fallback systems
  */
 
+import { ref, computed, readonly } from 'vue'
+
 export interface AIProvider {
   name: 'groq' | 'cerebras' | 'fallback'
   apiKey?: string
@@ -104,19 +106,39 @@ export const useUnifiedAIService = () => {
     }
   }
 
-  // Load API keys from environment or configuration
+  // Load API keys from runtime configuration
   const loadAPIKeys = async () => {
-    // In a real implementation, these would come from secure environment variables
-    // For demo purposes, we'll use placeholder values
-    const groqProvider = config.value.providers.find(p => p.name === 'groq')
-    const cerebrasProvider = config.value.providers.find(p => p.name === 'cerebras')
-    
-    if (groqProvider) {
-      groqProvider.apiKey = process.env.GROQ_API_KEY || ''
-    }
-    
-    if (cerebrasProvider) {
-      cerebrasProvider.apiKey = process.env.CEREBRAS_API_KEY || ''
+    try {
+      // Access runtime config for API keys
+      const runtimeConfig = useRuntimeConfig()
+      
+      const groqProvider = config.value.providers.find(p => p.name === 'groq')
+      const cerebrasProvider = config.value.providers.find(p => p.name === 'cerebras')
+      
+      if (groqProvider) {
+        groqProvider.apiKey = runtimeConfig.groqApiKey || ''
+        groqProvider.baseUrl = runtimeConfig.groqApiBase || 'https://api.groq.com/openai/v1'
+      }
+      
+      if (cerebrasProvider) {
+        cerebrasProvider.apiKey = runtimeConfig.cerebrasApiKey || ''
+        cerebrasProvider.baseUrl = runtimeConfig.cerebrasApiBase || 'https://api.cerebras.ai/v1'
+      }
+      
+      console.log('🔑 API keys loaded from runtime configuration')
+    } catch (error) {
+      console.error('❌ Failed to load API keys:', error)
+      // Fallback to environment variables if runtime config fails
+      const groqProvider = config.value.providers.find(p => p.name === 'groq')
+      const cerebrasProvider = config.value.providers.find(p => p.name === 'cerebras')
+      
+      if (groqProvider) {
+        groqProvider.apiKey = process.env.GROQ_API_KEY || ''
+      }
+      
+      if (cerebrasProvider) {
+        cerebrasProvider.apiKey = process.env.CEREBRAS_API_KEY || ''
+      }
     }
   }
 
