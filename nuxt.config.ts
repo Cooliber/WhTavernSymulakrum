@@ -70,9 +70,9 @@ export default defineNuxtConfig({
 
   // Nitro configuration for deployment
   nitro: {
-    preset: process.env.NITRO_PRESET || 'netlify-static',
+    preset: process.env.NITRO_PRESET || 'netlify',
     experimental: {
-      wasm: true
+      wasm: false // Disable WASM for stability on Netlify
     },
     storage: {
       redis: {
@@ -187,15 +187,5 @@ export default defineNuxtConfig({
   },
 
   // Quantum Server Options for Enhanced Stability
-  serverOptions: quantumServerManager.getServerOptions(),
-
-  // Nitro configuration with quantum enhancements
-  nitro: {
-    experimental: {
-      wasm: false // Disable for stability
-    },
-    minify: false, // Disable in development for debugging
-    sourceMap: true,
-    timing: false // Disable timing headers for tests
-  }
+  serverOptions: quantumServerManager.getServerOptions()
 })

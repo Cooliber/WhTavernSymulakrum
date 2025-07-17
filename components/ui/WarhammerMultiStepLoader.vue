@@ -341,10 +341,26 @@ const resetLoader = () => {
   steps.value.forEach(step => step.completed = false)
 }
 
+// Emergency timeout to prevent infinite loading
+let emergencyTimeout: NodeJS.Timeout | null = null
+
 // Lifecycle
 onMounted(() => {
   if (props.autoStart) {
     startLoading()
+  }
+
+  // Emergency timeout - force complete after 15 seconds
+  emergencyTimeout = setTimeout(() => {
+    console.warn('🚨 Emergency timeout - forcing loader completion')
+    emit('complete')
+    isLoading.value = false
+  }, 15000)
+})
+
+onUnmounted(() => {
+  if (emergencyTimeout) {
+    clearTimeout(emergencyTimeout)
   }
 })
 

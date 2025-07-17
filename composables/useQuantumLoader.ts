@@ -11,8 +11,8 @@ interface QuantumLoaderState {
   isTestEnvironment: boolean
   isDevelopment: boolean
   userAgent: string
-  performanceMode: 'fast' | 'normal' | 'cinematic'
-  consciousness: 'user' | 'test' | 'system'
+  performanceMode: 'fast' | 'normal' | 'cinematic' | 'optimized'
+  consciousness: 'user' | 'test' | 'system' | 'production'
 }
 
 interface LoaderConfig {
@@ -56,35 +56,66 @@ export const useQuantumLoader = () => {
       window.navigator.webdriver,
       window.__playwright,
       window.chrome?.runtime?.onConnect,
-      
+
       // Environment variables
       process.env.NODE_ENV === 'test',
       process.env.PLAYWRIGHT_TEST === 'true',
-      
+
       // URL patterns
       window.location.hostname === '127.0.0.1',
       window.location.port === '3005' || window.location.port === '3006',
-      
+
       // User agent patterns
       /HeadlessChrome|PhantomJS|Selenium|WebDriver/i.test(navigator.userAgent),
-      
+
       // Performance API indicators
       window.performance?.navigation?.type === 1, // Reload
-      
+
       // Timing indicators (tests are usually faster)
-      window.performance?.timing && 
+      window.performance?.timing &&
       (window.performance.timing.loadEventEnd - window.performance.timing.navigationStart) < 100
     ]
 
+    // Production Environment Detection (Netlify specific)
+    const productionIndicators = [
+      // Netlify specific domains
+      window.location.hostname.includes('.netlify.app'),
+      window.location.hostname.includes('.netlify.com'),
+
+      // Production environment variables
+      process.env.NODE_ENV === 'production',
+      process.env.NITRO_PRESET === 'netlify',
+      process.env.NITRO_PRESET === 'netlify-static',
+
+      // Custom domain patterns (if you have one)
+      window.location.protocol === 'https:' && !window.location.hostname.includes('localhost'),
+
+      // Netlify deployment context
+      process.env.CONTEXT === 'production' || process.env.CONTEXT === 'deploy-preview'
+    ]
+
     const isTest = testIndicators.some(indicator => indicator)
-    
+    const isProduction = productionIndicators.some(indicator => indicator)
+
+    // Determine consciousness level
+    let consciousness: 'user' | 'test' | 'system' | 'production' = 'user'
+    if (isTest) {
+      consciousness = 'test'
+    } else if (isProduction) {
+      consciousness = 'production'
+    } else if (process.env.NODE_ENV === 'development') {
+      consciousness = 'user'
+    } else {
+      consciousness = 'system'
+    }
+
     state.value = {
       isVisible: !isTest, // Invisible in test environments
       isTestEnvironment: isTest,
       isDevelopment: process.env.NODE_ENV === 'development',
       userAgent: navigator.userAgent,
-      performanceMode: isTest ? 'fast' : 'normal',
-      consciousness: isTest ? 'test' : 'user'
+      performanceMode: isTest ? 'fast' : (isProduction ? 'optimized' : 'normal'),
+      consciousness
     }
 
     // Adaptive configuration based on consciousness
@@ -96,6 +127,14 @@ export const useQuantumLoader = () => {
         testBypass: true,
         performanceOptimized: true
       }
+    } else if (state.value.consciousness === 'production') {
+      config.value = {
+        minDuration: 800, // Shorter for production
+        maxDuration: 2000, // Faster loading for real users
+        autoHide: true,
+        testBypass: false,
+        performanceOptimized: true
+      }
     } else if (state.value.consciousness === 'user') {
       config.value = {
         minDuration: 1500,
@@ -103,6 +142,15 @@ export const useQuantumLoader = () => {
         autoHide: true,
         testBypass: false,
         performanceOptimized: false
+      }
+    } else {
+      // System/fallback configuration
+      config.value = {
+        minDuration: 500,
+        maxDuration: 1500,
+        autoHide: true,
+        testBypass: false,
+        performanceOptimized: true
       }
     }
 
@@ -170,6 +218,24 @@ export const useQuantumLoader = () => {
         }
       }, 500) // Very short timeout for tests
     }
+
+    // Production environment safety net - aggressive timeout
+    if (state.value.consciousness === 'production') {
+      setTimeout(() => {
+        if (state.value.isVisible) {
+          console.log('🚀 Production safety net activated - force hiding loader')
+          forceHide()
+        }
+      }, 3000) // Maximum 3 seconds for production
+    }
+
+    // Emergency fallback - always hide after 10 seconds
+    setTimeout(() => {
+      if (state.value.isVisible) {
+        console.log('🚨 Emergency fallback - force hiding loader after 10 seconds')
+        forceHide()
+      }
+    }, 10000)
   }
 
   // Quantum Entanglement: Sync with other systems

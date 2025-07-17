@@ -25,6 +25,7 @@
 [context.production.environment]
   NODE_ENV = "production"
   NITRO_PRESET = "netlify"
+  CONTEXT = "production"
 
 # Headers for security and performance
 [[headers]]

@@ -277,6 +277,16 @@ onMounted(async () => {
     })
   }
 
+  // Log environment information for debugging
+  console.log('🌍 Environment Debug Info:', {
+    hostname: window.location.hostname,
+    protocol: window.location.protocol,
+    nodeEnv: process.env.NODE_ENV,
+    nitroPreset: process.env.NITRO_PRESET,
+    context: process.env.CONTEXT,
+    userAgent: navigator.userAgent
+  })
+
   // Initialize quantum loader with consciousness detection
   await quantumLoader.showLoader()
 
